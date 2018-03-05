@@ -16,12 +16,10 @@ limitations under the License.
 
 */
 
-const createStore = require('redux').createStore;
-
-const MatrixStore = createStore((action, state) => {
+const MatrixReducer = (action, state) => {
     return {};
-});
+};
 
 module.exports = {
-    MatrixStore
+    MatrixReducer
 }

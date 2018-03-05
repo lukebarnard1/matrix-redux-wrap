@@ -16,13 +16,23 @@ limitations under the License.
 
 */
 
-const MatrixStore = require('../src/index.js').MatrixStore;
-var expect = require('chai').expect;
+const MatrixReducer = require('../src/index.js').MatrixReducer;
+const expect = require('chai').expect;
 
-describe('the matrix-redux-wrap store', function() {
-  it('should expose the Redux API', function() {
-    expect(MatrixStore).to.have.property('getState').that.is.a('function');
-    expect(MatrixStore).to.have.property('dispatch').that.is.a('function');
-    expect(MatrixStore).to.have.property('subscribe').that.is.a('function');
-  });
+function runActionsAndExpectState (actions, expected) {
+    let actual = undefined;
+    actions.forEach((action) => {
+        actual = MatrixReducer(actual, actual);
+    });
+    expect(actual).to.eql(expected);
+}
+
+describe('the matrix-redux-wrap reducer', () => {
+    it('should be a function', () => {
+        expect(MatrixReducer).to.be.a('function');
+    });
+
+    it('should return initial state when given the `undefined` action', () => {
+        runActionsAndExpectState([undefined], {});
+    });
 });

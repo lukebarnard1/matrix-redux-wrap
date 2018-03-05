@@ -1,0 +1,23 @@
+{
+  "name": "matrix-redux-wrap",
+  "version": "1.0.0",
+  "description": "Expose matrix-js-sdk state as a Redux store",
+  "main": "index.js",
+  "dependencies": {
+    "redux": "^3.7.2"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/lukebarnard1/matrix-redux-wrap.git"
+  },
+  "author": "Luke Barnard <me@lukebarnard.co.uk>",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/lukebarnard1/matrix-redux-wrap/issues"
+  },
+  "homepage": "https://github.com/lukebarnard1/matrix-redux-wrap#readme"
+}

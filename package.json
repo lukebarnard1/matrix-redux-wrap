@@ -4,6 +4,7 @@
   "description": "Expose matrix-js-sdk state as a Redux store",
   "main": "index.js",
   "dependencies": {
+    "matrix-js-sdk": "^0.9.2",
     "redux": "^3.7.2"
   },
   "devDependencies": {},

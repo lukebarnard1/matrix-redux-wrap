@@ -22,7 +22,7 @@ const expect = require('chai').expect;
 function runActionsAndExpectState (actions, expected) {
     let actual = undefined;
     actions.forEach((action) => {
-        actual = MatrixReducer(actual, actual);
+        actual = MatrixReducer(action, actual);
     });
     expect(actual).to.eql(expected);
 }

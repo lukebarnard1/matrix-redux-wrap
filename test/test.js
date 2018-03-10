@@ -27,12 +27,73 @@ function runActionsAndExpectState (actions, expected) {
     expect(actual).to.eql(expected);
 }
 
+function createWrappedAPISuccessAction (method, result, id) {
+    return {
+        type: "mrw.wrapped_api.success",
+        method, result, id,
+    };
+}
+
+function createWrappedAPIFailureAction (method, error, id) {
+    return {
+        type: "mrw.wrapped_api.failure",
+        method, error, id,
+    };
+}
+
+function createWrappedAPIPendingAction (method, args, id) {
+    return {
+        type: "mrw.wrapped_api.pending",
+        method, args, id,
+    };
+}
+
+function createWrappedAPIActions (method, args) {
+    const id = Math.random().toString(16).slice(2);
+
+    const actions = [createWrappedAPIPendingAction(method, args, id)];
+    return {
+        succeed: (result) => {
+            actions.push(createWrappedAPISuccessAction(method, result, id));
+            return actions;
+        },
+        fail: (error) => {
+            actions.push(createWrappedAPIFailureAction(method, error, id));
+            return actions;
+        }
+    }
+}
+
 describe('the matrix-redux-wrap reducer', () => {
     it('should be a function', () => {
         expect(MatrixReducer).to.be.a('function');
     });
 
     it('should return initial state when given the `undefined` action', () => {
-        runActionsAndExpectState([undefined], {});
+        runActionsAndExpectState([undefined],
+            { mrw: { wrapped_api: {}}}
+        );
+    });
+
+    it('should update to include login credentials after login', () => {
+        const actions = [
+            undefined,
+            // Call login with args
+            ...createWrappedAPIActions(
+                "login", ["username", "password"]
+            ).succeed({
+                access_token: '12345'
+            }),
+        ];
+        runActionsAndExpectState(actions, {
+            mrw: { wrapped_api: { login: {
+                loading: false,
+                status: "success",
+                lastArgs: ["username", "password"],
+                lastResult: {
+                    access_token: '12345',
+                },
+            }}},
+        });
     });
 });

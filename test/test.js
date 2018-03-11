@@ -16,39 +16,45 @@ limitations under the License.
 
 */
 
-const MatrixReducer = require('../src/index.js').MatrixReducer;
-const expect = require('chai').expect;
+const { MatrixReducer } = require('../src/index.js').MatrixReducer;
+const { expect } = require('chai').expect;
 
-function runActionsAndExpectState (actions, expected) {
-    let actual = undefined;
+function runActionsAndExpectState(actions, expected) {
+    let actual;
     actions.forEach((action) => {
         actual = MatrixReducer(action, actual);
     });
     expect(actual).to.eql(expected);
 }
 
-function createWrappedAPISuccessAction (method, result, id) {
+function createWrappedAPISuccessAction(method, result, id) {
     return {
-        type: "mrw.wrapped_api.success",
-        method, result, id,
+        type: 'mrw.wrapped_api.success',
+        method,
+        result,
+        id,
     };
 }
 
-function createWrappedAPIFailureAction (method, error, id) {
+function createWrappedAPIFailureAction(method, error, id) {
     return {
-        type: "mrw.wrapped_api.failure",
-        method, error, id,
+        type: 'mrw.wrapped_api.failure',
+        method,
+        error,
+        id,
     };
 }
 
-function createWrappedAPIPendingAction (method, args, id) {
+function createWrappedAPIPendingAction(method, args, id) {
     return {
-        type: "mrw.wrapped_api.pending",
-        method, args, id,
+        type: 'mrw.wrapped_api.pending',
+        method,
+        args,
+        id,
     };
 }
 
-function createWrappedAPIActions (method, args) {
+function createWrappedAPIActions(method, args) {
     const id = Math.random().toString(16).slice(2);
 
     const actions = [createWrappedAPIPendingAction(method, args, id)];
@@ -60,8 +66,8 @@ function createWrappedAPIActions (method, args) {
         fail: (error) => {
             actions.push(createWrappedAPIFailureAction(method, error, id));
             return actions;
-        }
-    }
+        },
+    };
 }
 
 describe('the matrix-redux-wrap reducer', () => {
@@ -70,8 +76,9 @@ describe('the matrix-redux-wrap reducer', () => {
     });
 
     it('should return initial state when given the `undefined` action', () => {
-        runActionsAndExpectState([undefined],
-            { mrw: { wrapped_api: {}}}
+        runActionsAndExpectState(
+            [undefined],
+            { mrw: { wrapped_api: {} } },
         );
     });
 
@@ -79,21 +86,23 @@ describe('the matrix-redux-wrap reducer', () => {
         const actions = [
             undefined,
             // Call login with args
-            ...createWrappedAPIActions(
-                "login", ["username", "password"]
-            ).succeed({
-                access_token: '12345'
+            ...createWrappedAPIActions('login', ['username', 'password']).succeed({
+                access_token: '12345',
             }),
         ];
         runActionsAndExpectState(actions, {
-            mrw: { wrapped_api: { login: {
-                loading: false,
-                status: "success",
-                lastArgs: ["username", "password"],
-                lastResult: {
-                    access_token: '12345',
+            mrw: {
+                wrapped_api: {
+                    login: {
+                        loading: false,
+                        status: 'success',
+                        lastArgs: ['username', 'password'],
+                        lastResult: {
+                            access_token: '12345',
+                        },
+                    },
                 },
-            }}},
+            },
         });
     });
 });

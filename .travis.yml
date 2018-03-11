@@ -8,3 +8,4 @@ install:
 
 build:
   - npm test
+  - npm run lint

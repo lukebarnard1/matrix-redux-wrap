@@ -15,7 +15,8 @@
     "mocha": "^5.0.1"
   },
   "scripts": {
-    "test": "mocha"
+    "test": "mocha",
+    "lint": "eslint src test"
   },
   "repository": {
     "type": "git",

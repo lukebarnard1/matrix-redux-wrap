@@ -17,8 +17,8 @@ limitations under the License.
 
 */
 
-const { MatrixReducer } = require('../src/index.js').MatrixReducer;
-const { expect } = require('chai').expect;
+const { MatrixReducer } = require('../src/index.js');
+const { expect } = require('chai');
 
 function runActionsAndExpectState(actions, expected) {
     let actual;

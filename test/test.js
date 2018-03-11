@@ -1,3 +1,4 @@
+/* global describe it */
 /*
 
 Copyright 2018 Luke Barnard
@@ -70,12 +71,12 @@ function createWrappedAPIActions(method, args) {
     };
 }
 
-describe('the matrix-redux-wrap reducer', () => {
+describe('the matrix redux wrap reducer', () => {
     it('should be a function', () => {
         expect(MatrixReducer).to.be.a('function');
     });
 
-    it('should return initial state when given the `undefined` action', () => {
+    it('should return initial state when given the undefined action', () => {
         runActionsAndExpectState(
             [undefined],
             { mrw: { wrapped_api: {} } },

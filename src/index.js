@@ -60,11 +60,35 @@ function reduceWrappedAPIAction(action, path, state) {
     });
 }
 
+function reduceWrappedEventAction(action, state) {
+    switch (action.eventType) {
+    case 'Room.name': {
+        const roomId = action.event.getRoomId();
+        const prevState = Object.assign(
+            {},
+            state.mrw.wrapped_state.rooms[roomId] || {},
+        );
+
+        const newState = Object.assign(prevState, {
+            name: action.event.getContent().name,
+        });
+
+        return Object.assign(state, {
+            mrw: { wrapped_state: { rooms: { [roomId]: newState } } },
+        });
+    }
+    default:
+        return state;
+    }
+}
+
+function initialState() {
+    return { mrw: { wrapped_api: {}, wrapped_state: { rooms: {} } } };
+}
+
 function MatrixReducer(action, state) {
     if (action === undefined) {
-        return {
-            mrw: { wrapped_api: {} },
-        };
+        return initialState();
     }
     if (!isMatrixReduxAction(action)) return state;
 
@@ -74,7 +98,7 @@ function MatrixReducer(action, state) {
 
     switch (path[0]) {
     case 'wrapped_event':
-        return state; // XXX: Not implemented
+        return reduceWrappedEventAction(action, state);
     case 'wrapped_api':
         return reduceWrappedAPIAction(action, path, state);
     default:

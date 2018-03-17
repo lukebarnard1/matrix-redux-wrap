@@ -20,6 +20,8 @@ limitations under the License.
 const { MatrixReducer } = require('../src/index.js');
 const { expect } = require('chai');
 
+const { MatrixEvent } = require('matrix-js-sdk');
+
 function runActionsAndExpectState(actions, expected) {
     let actual;
     actions.forEach((action) => {
@@ -71,6 +73,10 @@ function createWrappedAPIActions(method, args) {
     };
 }
 
+function createWrappedEventAction(eventType, args) {
+    return { type: 'mrw.wrapped_event', eventType, ...args };
+}
+
 describe('the matrix redux wrap reducer', () => {
     it('should be a function', () => {
         expect(MatrixReducer).to.be.a('function');
@@ -79,7 +85,7 @@ describe('the matrix redux wrap reducer', () => {
     it('should return initial state when given the undefined action', () => {
         runActionsAndExpectState(
             [undefined],
-            { mrw: { wrapped_api: {} } },
+            { mrw: { wrapped_api: {}, wrapped_state: { rooms: {} } } },
         );
     });
 
@@ -139,6 +145,38 @@ describe('the matrix redux wrap reducer', () => {
                     },
                 },
             },
+        });
+    });
+
+    describe('should update matrix state accordingly', () => {
+        it('should update room state when receiving a room state event', () => {
+            const actions = [
+                undefined,
+                // Call login with args
+                createWrappedEventAction(
+                    'Room.name',
+                    {
+                        event: new MatrixEvent({
+                            type: 'm.room.name',
+                            content: {
+                                name: 'This is a room name',
+                            },
+                            room_id: '!myroomid',
+                        }),
+                    },
+                ),
+            ];
+            runActionsAndExpectState(actions, {
+                mrw: {
+                    wrapped_state: {
+                        rooms: {
+                            '!myroomid': {
+                                name: 'This is a room name',
+                            },
+                        },
+                    },
+                },
+            });
         });
     });
 });

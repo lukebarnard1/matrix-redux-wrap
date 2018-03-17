@@ -78,76 +78,78 @@ function createWrappedEventAction(eventType, args) {
 }
 
 describe('the matrix redux wrap reducer', () => {
-    it('should be a function', () => {
+    it('is a function', () => {
         expect(MatrixReducer).to.be.a('function');
     });
 
-    it('should return initial state when given the undefined action', () => {
+    it('returns initial state when given the undefined action', () => {
         runActionsAndExpectState(
             [undefined],
             { mrw: { wrapped_api: {}, wrapped_state: { rooms: {} } } },
         );
     });
 
-    it('should update to include login credentials after login', () => {
-        const actions = [
-            undefined,
-            ...createWrappedAPIActions('login', ['username', 'password']).succeed({
-                access_token: '12345',
-            }),
-        ];
-        runActionsAndExpectState(actions, {
-            mrw: {
-                wrapped_api: {
-                    login: {
-                        loading: false,
-                        status: 'success',
-                        lastArgs: ['username', 'password'],
-                        lastResult: {
-                            access_token: '12345',
+    describe('wraps promise-based APIs such that it', () => {
+        it('keeps the status of a call to the API as state', () => {
+            const actions = [
+                undefined,
+                ...createWrappedAPIActions('login', ['username', 'password']).succeed({
+                    access_token: '12345',
+                }),
+            ];
+            runActionsAndExpectState(actions, {
+                mrw: {
+                    wrapped_api: {
+                        login: {
+                            loading: false,
+                            status: 'success',
+                            lastArgs: ['username', 'password'],
+                            lastResult: {
+                                access_token: '12345',
+                            },
                         },
                     },
                 },
-            },
+            });
         });
-    });
 
-    it('should handle more than one update via wrapped APIs', () => {
-        const actions = [
-            undefined,
-            ...createWrappedAPIActions('login', ['username', 'password']).succeed({
-                access_token: '12345',
-            }),
-            ...createWrappedAPIActions('logout').succeed({
-                msg: 'Logout complete.',
-            }),
-        ];
-        runActionsAndExpectState(actions, {
-            mrw: {
-                wrapped_api: {
-                    login: {
-                        loading: false,
-                        status: 'success',
-                        lastArgs: ['username', 'password'],
-                        lastResult: {
-                            access_token: '12345',
+        it('reflects multiple APIs as state', () => {
+            const actions = [
+                undefined,
+                ...createWrappedAPIActions('login', ['username', 'password']).succeed({
+                    access_token: '12345',
+                }),
+                ...createWrappedAPIActions('logout').succeed({
+                    msg: 'Logout complete.',
+                }),
+            ];
+            runActionsAndExpectState(actions, {
+                mrw: {
+                    wrapped_api: {
+                        login: {
+                            loading: false,
+                            status: 'success',
+                            lastArgs: ['username', 'password'],
+                            lastResult: {
+                                access_token: '12345',
+                            },
                         },
-                    },
-                    logout: {
-                        loading: false,
-                        status: 'success',
-                        lastArgs: undefined,
-                        lastResult: {
-                            msg: 'Logout complete.',
+                        logout: {
+                            loading: false,
+                            status: 'success',
+                            lastArgs: undefined,
+                            lastResult: {
+                                msg: 'Logout complete.',
+                            },
                         },
                     },
                 },
-            },
+            });
         });
     });
 
-    describe('should update matrix state accordingly', () => {
-        it('should update room state when receiving a room event', () => {
+    describe('wraps matris-js-sdk state emitted as events such that it', () => {
+        it('handles new rooms sent to the client', () => {
             const actions = [
                 undefined,
                 createWrappedEventAction(
@@ -170,7 +172,7 @@ describe('the matrix redux wrap reducer', () => {
             });
         });
 
-        it('should update room name when receiving a room name event', () => {
+        it('updates room names', () => {
             const actions = [
                 undefined,
                 createWrappedEventAction(
@@ -199,7 +201,7 @@ describe('the matrix redux wrap reducer', () => {
             });
         });
 
-        it('should handle a new room followed by a room name change', () => {
+        it('handles a new room followed by a room name change', () => {
             const actions = [
                 undefined,
                 createWrappedEventAction(
@@ -234,7 +236,7 @@ describe('the matrix redux wrap reducer', () => {
             });
         });
 
-        it('should handle a new room followed by two room name changes', () => {
+        it('handles a new room followed by two room name changes', () => {
             const actions = [
                 undefined,
                 createWrappedEventAction(

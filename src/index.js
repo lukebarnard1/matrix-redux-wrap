@@ -56,7 +56,7 @@ function reduceWrappedAPIAction(action, path, state) {
     });
 
     return Object.assign(state, {
-        mrw: { wrapped_api: newState },
+        mrw: { wrapped_state: state.mrw.wrapped_state, wrapped_api: newState },
     });
 }
 
@@ -74,7 +74,7 @@ function reduceWrappedEventAction(action, state) {
         });
 
         return Object.assign(state, {
-            mrw: { wrapped_state: { rooms: { [roomId]: newState } } },
+            mrw: { wrapped_state: { rooms: { [roomId]: newState } }, wrapped_api: state.mrw.wrapped_api },
         });
     }
     case 'Room.name': {
@@ -89,7 +89,7 @@ function reduceWrappedEventAction(action, state) {
         });
 
         return Object.assign(state, {
-            mrw: { wrapped_state: { rooms: { [roomId]: newState } } },
+            mrw: { wrapped_state: { rooms: { [roomId]: newState } }, wrapped_api: state.mrw.wrapped_api },
         });
     }
     default:

@@ -99,6 +99,7 @@ describe('the matrix redux wrap reducer', () => {
             ];
             runActionsAndExpectState(actions, {
                 mrw: {
+                    wrapped_state: { rooms: {} },
                     wrapped_api: {
                         login: {
                             loading: false,
@@ -125,6 +126,7 @@ describe('the matrix redux wrap reducer', () => {
             ];
             runActionsAndExpectState(actions, {
                 mrw: {
+                    wrapped_state: { rooms: {} },
                     wrapped_api: {
                         login: {
                             loading: false,
@@ -161,6 +163,7 @@ describe('the matrix redux wrap reducer', () => {
             ];
             runActionsAndExpectState(actions, {
                 mrw: {
+                    wrapped_api: {},
                     wrapped_state: {
                         rooms: {
                             '!myroomid': {
@@ -190,6 +193,7 @@ describe('the matrix redux wrap reducer', () => {
             ];
             runActionsAndExpectState(actions, {
                 mrw: {
+                    wrapped_api: {},
                     wrapped_state: {
                         rooms: {
                             '!myroomid': {
@@ -225,6 +229,7 @@ describe('the matrix redux wrap reducer', () => {
             ];
             runActionsAndExpectState(actions, {
                 mrw: {
+                    wrapped_api: {},
                     wrapped_state: {
                         rooms: {
                             '!myroomid': {
@@ -272,10 +277,47 @@ describe('the matrix redux wrap reducer', () => {
             ];
             runActionsAndExpectState(actions, {
                 mrw: {
+                    wrapped_api: {},
                     wrapped_state: {
                         rooms: {
                             '!myroomid': {
                                 name: 'Some other crazy name',
+                            },
+                        },
+                    },
+                },
+            });
+        });
+
+        it('doesn\'t affect the wrapped_api state', () => {
+            const actions = [
+                undefined,
+                createWrappedEventAction(
+                    'Room',
+                    {
+                        room: new Room('!myroomid'),
+                    },
+                ),
+                ...createWrappedAPIActions('some_promise_api', [12345]).succeed({
+                    result: 'some result',
+                }),
+            ];
+            runActionsAndExpectState(actions, {
+                mrw: {
+                    wrapped_api: {
+                        some_promise_api: {
+                            loading: false,
+                            status: 'success',
+                            lastArgs: [12345],
+                            lastResult: {
+                                result: 'some result',
+                            },
+                        },
+                    },
+                    wrapped_state: {
+                        rooms: {
+                            '!myroomid': {
+                                name: null,
                             },
                         },
                     },

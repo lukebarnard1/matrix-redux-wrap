@@ -147,7 +147,7 @@ describe('the matrix redux wrap reducer', () => {
     });
 
     describe('should update matrix state accordingly', () => {
-        it('should update room state when receiving a room state event', () => {
+        it('should update room name when receiving a room name event', () => {
             const actions = [
                 undefined,
                 createWrappedEventAction(

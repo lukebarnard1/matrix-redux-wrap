@@ -106,4 +106,39 @@ describe('the matrix redux wrap reducer', () => {
             },
         });
     });
+
+    it('should handle more than one update via wrapped APIs', () => {
+        const actions = [
+            undefined,
+            // Call login with args
+            ...createWrappedAPIActions('login', ['username', 'password']).succeed({
+                access_token: '12345',
+            }),
+            ...createWrappedAPIActions('logout').succeed({
+                msg: 'Logout complete.',
+            }),
+        ];
+        runActionsAndExpectState(actions, {
+            mrw: {
+                wrapped_api: {
+                    login: {
+                        loading: false,
+                        status: 'success',
+                        lastArgs: ['username', 'password'],
+                        lastResult: {
+                            access_token: '12345',
+                        },
+                    },
+                    logout: {
+                        loading: false,
+                        status: 'success',
+                        lastArgs: undefined,
+                        lastResult: {
+                            msg: 'Logout complete.',
+                        },
+                    },
+                },
+            },
+        });
+    });
 });

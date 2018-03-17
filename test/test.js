@@ -92,7 +92,6 @@ describe('the matrix redux wrap reducer', () => {
     it('should update to include login credentials after login', () => {
         const actions = [
             undefined,
-            // Call login with args
             ...createWrappedAPIActions('login', ['username', 'password']).succeed({
                 access_token: '12345',
             }),
@@ -116,7 +115,6 @@ describe('the matrix redux wrap reducer', () => {
     it('should handle more than one update via wrapped APIs', () => {
         const actions = [
             undefined,
-            // Call login with args
             ...createWrappedAPIActions('login', ['username', 'password']).succeed({
                 access_token: '12345',
             }),
@@ -152,7 +150,6 @@ describe('the matrix redux wrap reducer', () => {
         it('should update room state when receiving a room state event', () => {
             const actions = [
                 undefined,
-                // Call login with args
                 createWrappedEventAction(
                     'Room.name',
                     {

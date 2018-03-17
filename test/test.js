@@ -20,7 +20,7 @@ limitations under the License.
 const { MatrixReducer } = require('../src/index.js');
 const { expect } = require('chai');
 
-const { MatrixEvent } = require('matrix-js-sdk');
+const { MatrixEvent, Room } = require('matrix-js-sdk');
 
 function runActionsAndExpectState(actions, expected) {
     let actual;
@@ -147,6 +147,29 @@ describe('the matrix redux wrap reducer', () => {
     });
 
     describe('should update matrix state accordingly', () => {
+        it('should update room state when receiving a room event', () => {
+            const actions = [
+                undefined,
+                createWrappedEventAction(
+                    'Room',
+                    {
+                        room: new Room('!myroomid'),
+                    },
+                ),
+            ];
+            runActionsAndExpectState(actions, {
+                mrw: {
+                    wrapped_state: {
+                        rooms: {
+                            '!myroomid': {
+                                name: null,
+                            },
+                        },
+                    },
+                },
+            });
+        });
+
         it('should update room name when receiving a room name event', () => {
             const actions = [
                 undefined,
@@ -169,6 +192,88 @@ describe('the matrix redux wrap reducer', () => {
                         rooms: {
                             '!myroomid': {
                                 name: 'This is a room name',
+                            },
+                        },
+                    },
+                },
+            });
+        });
+
+        it('should handle a new room followed by a room name change', () => {
+            const actions = [
+                undefined,
+                createWrappedEventAction(
+                    'Room',
+                    {
+                        room: new Room('!myroomid'),
+                    },
+                ),
+                createWrappedEventAction(
+                    'Room.name',
+                    {
+                        event: new MatrixEvent({
+                            type: 'm.room.name',
+                            content: {
+                                name: 'This is a room name',
+                            },
+                            room_id: '!myroomid',
+                        }),
+                    },
+                ),
+            ];
+            runActionsAndExpectState(actions, {
+                mrw: {
+                    wrapped_state: {
+                        rooms: {
+                            '!myroomid': {
+                                name: 'This is a room name',
+                            },
+                        },
+                    },
+                },
+            });
+        });
+
+        it('should handle a new room followed by two room name changes', () => {
+            const actions = [
+                undefined,
+                createWrappedEventAction(
+                    'Room',
+                    {
+                        room: new Room('!myroomid'),
+                    },
+                ),
+                createWrappedEventAction(
+                    'Room.name',
+                    {
+                        event: new MatrixEvent({
+                            type: 'm.room.name',
+                            content: {
+                                name: 'This is a room name',
+                            },
+                            room_id: '!myroomid',
+                        }),
+                    },
+                ),
+                createWrappedEventAction(
+                    'Room.name',
+                    {
+                        event: new MatrixEvent({
+                            type: 'm.room.name',
+                            content: {
+                                name: 'Some other crazy name',
+                            },
+                            room_id: '!myroomid',
+                        }),
+                    },
+                ),
+            ];
+            runActionsAndExpectState(actions, {
+                mrw: {
+                    wrapped_state: {
+                        rooms: {
+                            '!myroomid': {
+                                name: 'Some other crazy name',
                             },
                         },
                     },

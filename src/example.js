@@ -37,7 +37,7 @@ function doLoginAndSync(mxClient, user, password) {
         promise.then((resp) => {
             // Create a new matrix client for syncing with the server
             const syncClient = Matrix.createClient({
-                baseUrl: 'https://matrix.ldbco.de',
+                baseUrl: 'https://matrix.org',
                 userId: resp.user_id,
                 accessToken: resp.access_token,
             });

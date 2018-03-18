@@ -21,12 +21,35 @@ const Matrix = require('matrix-js-sdk');
 
 // Define Async Action Creators
 
-// Log a user into their matrix account
-function doLogin(mxClient, user, password) {
-    // Call to the matrix-js-sdk login API
-    const prom = mxClient.login('m.login.password', { user, password });
+function createWrappedEventAction(eventType, args) {
+    return { type: 'mrw.wrapped_event', eventType, ...args };
+}
 
-    return asyncAction('loginState', prom, { user });
+// Log a user into their matrix account and start syncing
+function doLoginAndSync(mxClient, user, password) {
+    return (dis) => {
+        // Call to the matrix-js-sdk login API
+        const promise = mxClient.login('m.login.password', { user, password });
+
+        // Action-ify this promise
+        asyncAction('loginState', promise, { user })(dis);
+
+        promise.then((resp) => {
+            // Create a new matrix client for syncing with the server
+            const syncClient = Matrix.createClient({
+                baseUrl: 'https://matrix.ldbco.de',
+                userId: resp.user_id,
+                accessToken: resp.access_token,
+            });
+            syncClient.on('Room', (room) => {
+                dis(createWrappedEventAction('Room', { room }));
+            });
+            syncClient.on('Room.name', (room) => {
+                dis(createWrappedEventAction('Room.name', { room }));
+            });
+            syncClient.startClient();
+        });
+    };
 }
 
 // A simple render function
@@ -41,23 +64,43 @@ function render(state) {
 
     if (loginState.loading) {
         view =
-            `  [ You are logging in, ${user}!    . ] -> `;
+            `  [ You are logging in, ${user}!    . ]`;
     } else {
         view = loginState.status === 'success' ?
-            `  [ You're now logged in, ${user}!  ✓ ] <-` :
-            `  [ You failed to log in, ${user}!  ⤫ ] <-`;
+            `  [ You're now logged in, ${user}!  ✓ ]` :
+            `  [ You failed to log in, ${user}!  ⤫ ]`;
     }
 
-    return view;
+    let roomView = '';
+
+    if (state.mrw.wrapped_state.rooms &&
+        Object.keys(state.mrw.wrapped_state.rooms).length > 0
+    ) {
+        roomView = [
+            '\n    [ Rooms ]',
+            ...Object.keys(state.mrw.wrapped_state.rooms)
+                .map(k => state.mrw.wrapped_state.rooms[k].name)
+                .slice(0, 5),
+        ].join(' \n      - ');
+    }
+
+    return `${view}${roomView}`;
 }
 
 // A super simple app
 let state = {};
 let view = '';
+let nextView = '';
 function dispatch(action) {
     state = MatrixReducer(action, state);
-    view = render(state);
-    console.info(`${view}`);
+
+    nextView = render(state);
+
+    // Prevent unecessary re-renders
+    if (nextView !== view) {
+        view = nextView;
+        console.info(`${view}`);
+    }
 }
 
 console.info();

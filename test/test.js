@@ -292,15 +292,15 @@ describe('the matrix redux wrap reducer', () => {
         it('doesn\'t affect the wrapped_api state', () => {
             const actions = [
                 undefined,
+                ...createWrappedAPIActions('some_promise_api', [12345]).succeed({
+                    result: 'some result',
+                }),
                 createWrappedEventAction(
                     'Room',
                     {
                         room: new Room('!myroomid'),
                     },
                 ),
-                ...createWrappedAPIActions('some_promise_api', [12345]).succeed({
-                    result: 'some result',
-                }),
             ];
             runActionsAndExpectState(actions, {
                 mrw: {

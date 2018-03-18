@@ -26,7 +26,7 @@ function createWrappedEventAction(eventType, args) {
 }
 
 // Log a user into their matrix account and start syncing
-function doLoginAndSync(mxClient, user, password) {
+function doLoginAndSync(mxClient, baseUrl, user, password) {
     return (dis) => {
         // Call to the matrix-js-sdk login API
         const promise = mxClient.login('m.login.password', { user, password });
@@ -37,7 +37,7 @@ function doLoginAndSync(mxClient, user, password) {
         promise.then((resp) => {
             // Create a new matrix client for syncing with the server
             const syncClient = Matrix.createClient({
-                baseUrl: 'https://matrix.org',
+                baseUrl,
                 userId: resp.user_id,
                 accessToken: resp.access_token,
             });
@@ -108,12 +108,11 @@ console.info('---------------------------------------------------');
 console.info('This is a simple example of matrixReduce usage! :D');
 console.info('---------------------------------------------------');
 
-const mxClient = Matrix.createClient({
-    baseUrl: 'https://matrix.org',
-});
+const baseUrl = 'https://matrix.org';
+const mxClient = Matrix.createClient({ baseUrl });
 
 // initialise store
 dispatch(undefined);
 
-doLoginAndSync(mxClient, 'username', 'password')(dispatch);
+doLoginAndSync(mxClient, baseUrl, 'username', 'password')(dispatch);
 

@@ -17,7 +17,7 @@ limitations under the License.
 
 */
 
-const { MatrixReducer } = require('../src/index.js');
+const { matrixReduce } = require('../src/index.js');
 const { expect } = require('chai');
 
 const { Room } = require('matrix-js-sdk');
@@ -31,7 +31,7 @@ const {
 function runActionsAndExpectState(actions, expected) {
     let actual;
     actions.forEach((action) => {
-        actual = MatrixReducer(action, actual);
+        actual = matrixReduce(action, actual);
     });
     expect(actual).to.eql(expected);
 }
@@ -58,7 +58,7 @@ function createWrappedEventAction(eventType, args) {
 
 describe('the matrix redux wrap reducer', () => {
     it('is a function', () => {
-        expect(MatrixReducer).to.be.a('function');
+        expect(matrixReduce).to.be.a('function');
     });
 
     it('returns initial state when given the undefined action', () => {

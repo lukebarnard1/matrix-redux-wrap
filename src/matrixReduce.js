@@ -111,7 +111,7 @@ function initialState() {
     return { mrw: { wrapped_api: {}, wrapped_state: { rooms: {} } } };
 }
 
-function MatrixReducer(action, state) {
+function matrixReduce(action, state) {
     if (action === undefined) {
         return initialState();
     }
@@ -143,4 +143,4 @@ function MatrixReducer(action, state) {
     return setInObj(state, subReducer.statePath, newState);
 }
 
-module.exports = MatrixReducer;
+module.exports = matrixReduce;

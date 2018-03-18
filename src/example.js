@@ -16,7 +16,7 @@ limitations under the License.
 
 */
 
-const { MatrixReducer, asyncAction } = require('./index.js');
+const { matrixReduce, asyncAction } = require('./index.js');
 const Matrix = require('matrix-js-sdk');
 
 // Define Async Action Creators
@@ -92,7 +92,7 @@ let state = {};
 let view = '';
 let nextView = '';
 function dispatch(action) {
-    state = MatrixReducer(action, state);
+    state = matrixReduce(action, state);
 
     nextView = render(state);
 
@@ -105,7 +105,7 @@ function dispatch(action) {
 
 console.info();
 console.info('---------------------------------------------------');
-console.info('This is a simple example of MatrixReducer usage! :D');
+console.info('This is a simple example of matrixReduce usage! :D');
 console.info('---------------------------------------------------');
 
 const mxClient = Matrix.createClient({

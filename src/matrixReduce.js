@@ -19,7 +19,7 @@ limitations under the License.
 const getInObj = (obj, path) =>
     (path.reduce((value, el) => value[el], obj));
 
-const setInObj = (obj, pathItems, value) => {
+const setInObj = (obj = {}, pathItems, value) => {
     if (pathItems.length === 1) {
         const pathItem = pathItems.shift();
         return Object.assign(

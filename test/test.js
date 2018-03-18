@@ -20,7 +20,7 @@ limitations under the License.
 const { MatrixReducer } = require('../src/index.js');
 const { expect } = require('chai');
 
-const { MatrixEvent, Room } = require('matrix-js-sdk');
+const { Room } = require('matrix-js-sdk');
 
 const {
     createWrappedAPISuccessAction,

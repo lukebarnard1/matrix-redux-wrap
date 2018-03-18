@@ -61,7 +61,7 @@ function doLoginAndSync(mxClient, baseUrl, user, password) {
             });
             syncClient.startClient();
 
-            console.info('-----------will log out in 10s-----------');
+            console.info('-----------will log out in 20s-----------');
             setTimeout(() => {
                 syncClient.stopClient();
                 doLogout(syncClient)(dis);

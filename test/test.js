@@ -148,6 +148,42 @@ describe('the matrix redux wrap reducer', () => {
                 },
             });
         });
+
+        it('doesn\'t affect the wrapped_event state', () => {
+            const actions = [
+                undefined,
+                createWrappedEventAction(
+                    'Room',
+                    {
+                        room: new Room('!myroomid'),
+                    },
+                ),
+                ...createWrappedAPIActions('some_promise_api', [12345]).succeed({
+                    result: 'some result',
+                }),
+            ];
+            runActionsAndExpectState(actions, {
+                mrw: {
+                    wrapped_api: {
+                        some_promise_api: {
+                            loading: false,
+                            status: 'success',
+                            lastArgs: [12345],
+                            lastResult: {
+                                result: 'some result',
+                            },
+                        },
+                    },
+                    wrapped_state: {
+                        rooms: {
+                            '!myroomid': {
+                                name: null,
+                            },
+                        },
+                    },
+                },
+            });
+        });
     });
 
     describe('wraps matris-js-sdk state emitted as events such that it', () => {

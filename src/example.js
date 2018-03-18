@@ -115,5 +115,5 @@ const mxClient = Matrix.createClient({
 // initialise store
 dispatch(undefined);
 
-doLogin(mxClient, 'username', 'password')(dispatch);
+doLoginAndSync(mxClient, 'username', 'password')(dispatch);
 

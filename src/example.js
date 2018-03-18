@@ -112,10 +112,8 @@ function render(state) {
             '\n    [ Rooms ]',
             ...Object.keys(state.mrw.wrapped_state.rooms)
                 .map((k) => {
-                    const memberCount = Object.keys(
-                        state.mrw.wrapped_state.rooms[k].members,
-                    ).length;
-                    const { name } = state.mrw.wrapped_state.rooms[k];
+                    const { name, members } = state.mrw.wrapped_state.rooms[k];
+                    const memberCount = Object.keys(members).length;
                     return `${name}: ${memberCount} members`;
                 }).slice(0, 5),
         ].join(' \n      - ');

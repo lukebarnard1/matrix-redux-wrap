@@ -89,6 +89,7 @@ function reduceWrappedEventAction(action, path, wrappedState) {
             {},
             wrappedState.rooms[roomId] || {
                 name: null,
+                members: {},
             },
         );
 
@@ -100,6 +101,7 @@ function reduceWrappedEventAction(action, path, wrappedState) {
             {},
             wrappedState.rooms[roomId] || {
                 name: null,
+                members: {},
             },
         );
 
@@ -108,6 +110,31 @@ function reduceWrappedEventAction(action, path, wrappedState) {
         });
 
         return setInObj(wrappedState, ['rooms', roomId], newState);
+    }
+    case 'RoomMember.membership': {
+        const { event, member } = action.emittedArgs;
+        const roomId = event.getRoomId();
+        const { userId } = member;
+
+        return setInObj(
+            wrappedState,
+            ['rooms', roomId, 'members', userId],
+            {
+                membership: member.membership,
+                name: member.name,
+            },
+        );
+    }
+    case 'RoomMember.name': {
+        const { event, member } = action.emittedArgs;
+        const roomId = event.getRoomId();
+        const { userId } = member;
+
+        return setInObj(
+            wrappedState,
+            ['rooms', roomId, 'members', userId, 'name'],
+            member.name,
+        );
     }
     default:
         return wrappedState;

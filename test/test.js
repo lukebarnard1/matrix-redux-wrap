@@ -20,7 +20,7 @@ limitations under the License.
 const { matrixReduce } = require('../src/index.js');
 const { expect } = require('chai');
 
-const { Room } = require('matrix-js-sdk');
+const { MatrixEvent, Room, RoomMember} = require('matrix-js-sdk');
 
 const {
     createWrappedAPISuccessAction,
@@ -156,6 +156,7 @@ describe('the matrix redux wrap reducer', () => {
                     wrapped_state: {
                         rooms: {
                             '!myroomid': {
+                                members: {},
                                 name: null,
                             },
                         },
@@ -183,6 +184,7 @@ describe('the matrix redux wrap reducer', () => {
                     wrapped_state: {
                         rooms: {
                             '!myroomid': {
+                                members: {},
                                 name: null,
                             },
                         },
@@ -214,9 +216,11 @@ describe('the matrix redux wrap reducer', () => {
                     wrapped_state: {
                         rooms: {
                             '!myroomid': {
+                                members: {},
                                 name: null,
                             },
                             '!someotherroomid': {
+                                members: {},
                                 name: null,
                             },
                         },
@@ -244,6 +248,7 @@ describe('the matrix redux wrap reducer', () => {
                     wrapped_state: {
                         rooms: {
                             '!myroomid': {
+                                members: {},
                                 name: 'This is a room name',
                             },
                         },
@@ -277,6 +282,7 @@ describe('the matrix redux wrap reducer', () => {
                     wrapped_state: {
                         rooms: {
                             '!myroomid': {
+                                members: {},
                                 name: 'This is a room name',
                             },
                         },
@@ -310,6 +316,7 @@ describe('the matrix redux wrap reducer', () => {
                     wrapped_state: {
                         rooms: {
                             '!myroomid': {
+                                members: {},
                                 name: 'This is a room name',
                             },
                         },
@@ -351,6 +358,7 @@ describe('the matrix redux wrap reducer', () => {
                     wrapped_state: {
                         rooms: {
                             '!myroomid': {
+                                members: {},
                                 name: 'Some other crazy name',
                             },
                         },
@@ -388,6 +396,7 @@ describe('the matrix redux wrap reducer', () => {
                     wrapped_state: {
                         rooms: {
                             '!myroomid': {
+                                members: {},
                                 name: null,
                             },
                         },
@@ -415,6 +424,184 @@ describe('the matrix redux wrap reducer', () => {
                         sync: {
                             state: 'SYNCING',
                         },
+                    },
+                },
+            });
+        });
+
+        it('handles new room members', () => {
+            const member = new RoomMember('!myroomid', '@userid:domain');
+            const event = new MatrixEvent({
+                room_id: '!myroomid',
+                type: 'm.room.member',
+                content: {
+                    membership: 'join',
+                },
+            });
+            member.setMembershipEvent(event);
+            const actions = [
+                undefined,
+                createWrappedEventAction(
+                    'Room',
+                    {
+                        room: new Room('!myroomid'),
+                    },
+                ),
+                createWrappedEventAction(
+                    'RoomMember.membership',
+                    {
+                        event,
+                        member,
+                    },
+                ),
+            ];
+            runActionsAndExpectState(actions, {
+                mrw: {
+                    wrapped_api: {},
+                    wrapped_state: {
+                        rooms: {
+                            '!myroomid': {
+                                name: null,
+                                members: {
+                                    '@userid:domain': {
+                                        membership: 'join',
+                                        name: '@userid:domain',
+                                    },
+                                },
+                            },
+                        },
+                        sync: {},
+                    },
+                },
+            });
+        });
+
+        it('handles new room members, with name changes', () => {
+            const member = new RoomMember('!myroomid', '@userid:domain');
+            const event = new MatrixEvent({
+                room_id: '!myroomid',
+                type: 'm.room.member',
+                content: {
+                    membership: 'join',
+                },
+            });
+            const nameEvent = new MatrixEvent({
+                room_id: '!myroomid',
+                type: 'm.room.member',
+                content: {
+                    membership: 'join',
+                    displayname: 'Neo',
+                },
+            });
+            member.setMembershipEvent(nameEvent);
+            const actions = [
+                undefined,
+                createWrappedEventAction(
+                    'Room',
+                    {
+                        room: new Room('!myroomid'),
+                    },
+                ),
+                createWrappedEventAction(
+                    'RoomMember.membership',
+                    {
+                        event,
+                        member,
+                    },
+                ),
+                createWrappedEventAction(
+                    'RoomMember.name',
+                    {
+                        event: nameEvent,
+                        member,
+                    },
+                ),
+            ];
+            runActionsAndExpectState(actions, {
+                mrw: {
+                    wrapped_api: {},
+                    wrapped_state: {
+                        rooms: {
+                            '!myroomid': {
+                                name: null,
+                                members: {
+                                    '@userid:domain': {
+                                        membership: 'join',
+                                        name: 'Neo',
+                                    },
+                                },
+                            },
+                        },
+                        sync: {},
+                    },
+                },
+            });
+        });
+
+        it('handles multiple room members', () => {
+            const memberA = new RoomMember('!myroomid', '@userid1:domain');
+            const memberB = new RoomMember('!myroomid', '@userid2:domain');
+            const eventA = new MatrixEvent({
+                room_id: '!myroomid',
+                type: 'm.room.member',
+                content: {
+                    membership: 'join',
+                    displayname: 'Morpheus',
+                },
+            });
+            const eventB = new MatrixEvent({
+                room_id: '!myroomid',
+                type: 'm.room.member',
+                content: {
+                    membership: 'join',
+                    displayname: 'Trinity',
+                },
+            });
+            memberA.setMembershipEvent(eventA);
+            memberB.setMembershipEvent(eventB);
+            const actions = [
+                undefined,
+                createWrappedEventAction(
+                    'Room',
+                    {
+                        room: new Room('!myroomid'),
+                    },
+                ),
+                createWrappedEventAction(
+                    'RoomMember.membership',
+                    {
+                        event: eventA,
+                        member: memberA,
+                    },
+                ),
+                createWrappedEventAction(
+                    'RoomMember.membership',
+                    {
+                        event: eventB,
+                        member: memberB,
+                    },
+                ),
+            ];
+            runActionsAndExpectState(actions, {
+                mrw: {
+                    wrapped_api: {},
+                    wrapped_state: {
+                        rooms: {
+                            '!myroomid': {
+                                name: null,
+                                members: {
+                                    '@userid1:domain': {
+                                        membership: 'join',
+                                        name: 'Morpheus',
+                                    },
+                                    '@userid2:domain': {
+                                        membership: 'join',
+                                        name: 'Trinity',
+                                    },
+                                },
+                            },
+                        },
+                        sync: {},
                     },
                 },
             });

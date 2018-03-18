@@ -19,10 +19,16 @@ limitations under the License.
 const { matrixReduce, asyncAction } = require('./index.js');
 const Matrix = require('matrix-js-sdk');
 
+const readline = require('readline');
+
 // Define Async Action Creators
 
 function createWrappedEventAction(emittedType, emittedArgs) {
     return { type: 'mrw.wrapped_event', emittedType, emittedArgs };
+}
+
+function doLogout(mxClient) {
+    return asyncAction('logoutState', mxClient.logout());
 }
 
 // Log a user into their matrix account and start syncing
@@ -48,6 +54,12 @@ function doLoginAndSync(mxClient, baseUrl, user, password) {
                 dis(createWrappedEventAction('Room.name', { room }));
             });
             syncClient.startClient();
+
+            console.info('-----------will log out in 10s-----------');
+            setTimeout(() => {
+                syncClient.stopClient();
+                doLogout(syncClient)(dis);
+            }, 20000);
         });
     };
 }
@@ -56,13 +68,27 @@ function doLoginAndSync(mxClient, baseUrl, user, password) {
 function render(state) {
     let view = '';
 
-    const { loginState } = state.mrw.wrapped_api;
+    const {
+        loginState,
+        logoutState,
+    } = state.mrw.wrapped_api;
+
     if (!loginState) {
         return view;
     }
+
     const { user } = loginState.pendingState;
 
-    if (loginState.loading) {
+    if (logoutState) {
+        if (logoutState.loading) {
+            view =
+                `  [ You are logging out, ${user}     . ]`;
+        } else {
+            view = logoutState.status === 'success' ?
+                `  [ You're now logged out, ${user}!  ✓ ]` :
+                `  [ You failed to log out, ${user}!  ⤫ ]`;
+        }
+    } else if (loginState.loading) {
         view =
             `  [ You are logging in, ${user}!    . ]`;
     } else {
@@ -108,11 +134,25 @@ console.info('---------------------------------------------------');
 console.info('This is a simple example of matrixReduce usage! :D');
 console.info('---------------------------------------------------');
 
-const baseUrl = 'https://matrix.org';
-const mxClient = Matrix.createClient({ baseUrl });
+let domain = 'matrix.org';
 
 // initialise store
 dispatch(undefined);
 
-doLoginAndSync(mxClient, baseUrl, 'username', 'password')(dispatch);
+const rl = readline.createInterface({
+    input: process.stdin,
+    output: process.stdout,
+});
 
+rl.question(`What's your home server? (${domain}): `, (newDomain) => {
+    domain = newDomain.length > 0 ? newDomain : domain;
+
+    const baseUrl = `https://${domain}`;
+    const mxClient = Matrix.createClient({ baseUrl });
+
+    rl.question('And your credentials? (username password): ', (answer) => {
+        const [username, password] = answer.split(' ');
+
+        doLoginAndSync(mxClient, baseUrl, username, password)(dispatch);
+    });
+});

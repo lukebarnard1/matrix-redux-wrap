@@ -281,6 +281,38 @@ describe('the matrix redux wrap reducer', () => {
             });
         });
 
+        it('handles a room name change followed by a new room', () => {
+            const namedRoom = new Room('!myroomid');
+            namedRoom.name = 'This is a room name';
+            const actions = [
+                undefined,
+                createWrappedEventAction(
+                    'Room.name',
+                    {
+                        room: namedRoom,
+                    },
+                ),
+                createWrappedEventAction(
+                    'Room',
+                    {
+                        room: new Room('!myroomid'),
+                    },
+                ),
+            ];
+            runActionsAndExpectState(actions, {
+                mrw: {
+                    wrapped_api: {},
+                    wrapped_state: {
+                        rooms: {
+                            '!myroomid': {
+                                name: 'This is a room name',
+                            },
+                        },
+                    },
+                },
+            });
+        });
+
         it('handles a new room followed by two room name changes', () => {
             const namedRoom = new Room('!myroomid');
             namedRoom.name = 'This is a room name';

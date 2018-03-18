@@ -53,6 +53,12 @@ function doLoginAndSync(mxClient, baseUrl, user, password) {
             syncClient.on('Room.name', (room) => {
                 dis(createWrappedEventAction('Room.name', { room }));
             });
+            syncClient.on('RoomMember.membership', (event, member) => {
+                dis(createWrappedEventAction('RoomMember.membership', { event, member }));
+            });
+            syncClient.on('RoomMember.name', (event, member) => {
+                dis(createWrappedEventAction('RoomMember.name', { event, member }));
+            });
             syncClient.startClient();
 
             console.info('-----------will log out in 10s-----------');
@@ -105,8 +111,13 @@ function render(state) {
         roomView = [
             '\n    [ Rooms ]',
             ...Object.keys(state.mrw.wrapped_state.rooms)
-                .map(k => state.mrw.wrapped_state.rooms[k].name)
-                .slice(0, 5),
+                .map((k) => {
+                    const memberCount = Object.keys(
+                        state.mrw.wrapped_state.rooms[k].members,
+                    ).length;
+                    const { name } = state.mrw.wrapped_state.rooms[k];
+                    return `${name}: ${memberCount} members`;
+                }).slice(0, 5),
         ].join(' \n      - ');
     }
 

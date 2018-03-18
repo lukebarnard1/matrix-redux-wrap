@@ -76,6 +76,13 @@ function reduceWrappedAPIAction(action, path, state) {
 
 function reduceWrappedEventAction(action, path, wrappedState) {
     switch (action.emittedType) {
+    case 'sync': {
+        return setInObj(
+            wrappedState,
+            ['sync', 'state'],
+            action.emittedArgs.state,
+        );
+    }
     case 'Room': {
         const { roomId } = action.emittedArgs.room;
         const newState = Object.assign(
@@ -108,7 +115,7 @@ function reduceWrappedEventAction(action, path, wrappedState) {
 }
 
 function initialState() {
-    return { mrw: { wrapped_api: {}, wrapped_state: { rooms: {} } } };
+    return { mrw: { wrapped_api: {}, wrapped_state: { rooms: {}, sync: {} } } };
 }
 
 function matrixReduce(action, state) {

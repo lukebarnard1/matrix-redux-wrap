@@ -64,7 +64,7 @@ describe('the matrix redux wrap reducer', () => {
     it('returns initial state when given the undefined action', () => {
         runActionsAndExpectState(
             [undefined],
-            { mrw: { wrapped_api: {}, wrapped_state: { rooms: {} } } },
+            { mrw: { wrapped_api: {}, wrapped_state: { rooms: {}, sync: {} } } },
         );
     });
 
@@ -78,7 +78,7 @@ describe('the matrix redux wrap reducer', () => {
             ];
             runActionsAndExpectState(actions, {
                 mrw: {
-                    wrapped_state: { rooms: {} },
+                    wrapped_state: { rooms: {}, sync: {} },
                     wrapped_api: {
                         login: {
                             loading: false,
@@ -105,7 +105,7 @@ describe('the matrix redux wrap reducer', () => {
             ];
             runActionsAndExpectState(actions, {
                 mrw: {
-                    wrapped_state: { rooms: {} },
+                    wrapped_state: { rooms: {}, sync: {} },
                     wrapped_api: {
                         login: {
                             loading: false,
@@ -159,6 +159,7 @@ describe('the matrix redux wrap reducer', () => {
                                 name: null,
                             },
                         },
+                        sync: {},
                     },
                 },
             });
@@ -185,6 +186,7 @@ describe('the matrix redux wrap reducer', () => {
                                 name: null,
                             },
                         },
+                        sync: {},
                     },
                 },
             });
@@ -218,6 +220,7 @@ describe('the matrix redux wrap reducer', () => {
                                 name: null,
                             },
                         },
+                        sync: {},
                     },
                 },
             });
@@ -244,6 +247,7 @@ describe('the matrix redux wrap reducer', () => {
                                 name: 'This is a room name',
                             },
                         },
+                        sync: {},
                     },
                 },
             });
@@ -276,6 +280,7 @@ describe('the matrix redux wrap reducer', () => {
                                 name: 'This is a room name',
                             },
                         },
+                        sync: {},
                     },
                 },
             });
@@ -308,6 +313,7 @@ describe('the matrix redux wrap reducer', () => {
                                 name: 'This is a room name',
                             },
                         },
+                        sync: {},
                     },
                 },
             });
@@ -348,6 +354,7 @@ describe('the matrix redux wrap reducer', () => {
                                 name: 'Some other crazy name',
                             },
                         },
+                        sync: {},
                     },
                 },
             });
@@ -383,6 +390,30 @@ describe('the matrix redux wrap reducer', () => {
                             '!myroomid': {
                                 name: null,
                             },
+                        },
+                        sync: {},
+                    },
+                },
+            });
+        });
+
+        it('tracks sync state', () => {
+            const actions = [
+                undefined,
+                createWrappedEventAction(
+                    'sync',
+                    {
+                        state: 'SYNCING',
+                    },
+                ),
+            ];
+            runActionsAndExpectState(actions, {
+                mrw: {
+                    wrapped_api: {},
+                    wrapped_state: {
+                        rooms: {},
+                        sync: {
+                            state: 'SYNCING',
                         },
                     },
                 },

@@ -44,7 +44,7 @@ function reduceWrappedAPIAction(action, path, state) {
         break;
     }
     case 'pending': {
-        apiState.lastArgs = action.args;
+        apiState.pendingState = action.pendingState;
         break;
     }
     default:

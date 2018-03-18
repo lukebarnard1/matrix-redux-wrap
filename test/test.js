@@ -22,6 +22,12 @@ const { expect } = require('chai');
 
 const { MatrixEvent, Room } = require('matrix-js-sdk');
 
+const {
+    createWrappedAPISuccessAction,
+    createWrappedAPIFailureAction,
+    createWrappedAPIPendingAction,
+} = require('../src/wrappedAPI.js');
+
 function runActionsAndExpectState(actions, expected) {
     let actual;
     actions.forEach((action) => {
@@ -30,37 +36,10 @@ function runActionsAndExpectState(actions, expected) {
     expect(actual).to.eql(expected);
 }
 
-function createWrappedAPISuccessAction(method, result, id) {
-    return {
-        type: 'mrw.wrapped_api.success',
-        method,
-        result,
-        id,
-    };
-}
-
-function createWrappedAPIFailureAction(method, error, id) {
-    return {
-        type: 'mrw.wrapped_api.failure',
-        method,
-        error,
-        id,
-    };
-}
-
-function createWrappedAPIPendingAction(method, args, id) {
-    return {
-        type: 'mrw.wrapped_api.pending',
-        method,
-        args,
-        id,
-    };
-}
-
-function createWrappedAPIActions(method, args) {
+function createWrappedAPIActions(method, pendingState) {
     const id = Math.random().toString(16).slice(2);
 
-    const actions = [createWrappedAPIPendingAction(method, args, id)];
+    const actions = [createWrappedAPIPendingAction(method, pendingState, id)];
     return {
         succeed: (result) => {
             actions.push(createWrappedAPISuccessAction(method, result, id));
@@ -104,7 +83,7 @@ describe('the matrix redux wrap reducer', () => {
                         login: {
                             loading: false,
                             status: 'success',
-                            lastArgs: ['username', 'password'],
+                            pendingState: ['username', 'password'],
                             lastResult: {
                                 access_token: '12345',
                             },
@@ -131,7 +110,7 @@ describe('the matrix redux wrap reducer', () => {
                         login: {
                             loading: false,
                             status: 'success',
-                            lastArgs: ['username', 'password'],
+                            pendingState: ['username', 'password'],
                             lastResult: {
                                 access_token: '12345',
                             },
@@ -139,7 +118,7 @@ describe('the matrix redux wrap reducer', () => {
                         logout: {
                             loading: false,
                             status: 'success',
-                            lastArgs: undefined,
+                            pendingState: undefined,
                             lastResult: {
                                 msg: 'Logout complete.',
                             },
@@ -168,7 +147,7 @@ describe('the matrix redux wrap reducer', () => {
                         some_promise_api: {
                             loading: false,
                             status: 'success',
-                            lastArgs: [12345],
+                            pendingState: [12345],
                             lastResult: {
                                 result: 'some result',
                             },
@@ -344,7 +323,7 @@ describe('the matrix redux wrap reducer', () => {
                         some_promise_api: {
                             loading: false,
                             status: 'success',
-                            lastArgs: [12345],
+                            pendingState: [12345],
                             lastResult: {
                                 result: 'some result',
                             },

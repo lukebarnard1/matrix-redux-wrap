@@ -23,11 +23,11 @@ function isMatrixReduxAction(action) {
 }
 
 function reduceWrappedAPIAction(action, path, state) {
-    const prevState = state.mrw.wrapped_api;
+    const prevState = state;
     const status = path[1];
 
     const apiState = Object.assign(
-        state.mrw.wrapped_api[action.method] || {},
+        state[action.method] || {},
         {
             status, // pending/success/failure
             loading: status === 'pending',
@@ -51,61 +51,69 @@ function reduceWrappedAPIAction(action, path, state) {
         break;
     }
 
-    const newState = Object.assign(prevState, {
+    return Object.assign(prevState, {
         [action.method]: apiState,
-    });
-
-    return Object.assign(state, {
-        mrw: { wrapped_state: state.mrw.wrapped_state, wrapped_api: newState },
     });
 }
 
-function reduceWrappedEventAction(action, state) {
+function reduceWrappedEventAction(action, path, wrappedState) {
     switch (action.eventType) {
     case 'Room': {
         const { roomId } = action.room;
         const prevState = Object.assign(
             {},
-            state.mrw.wrapped_state.rooms[roomId] || {},
+            wrappedState.rooms[roomId] || {},
         );
 
         const newState = Object.assign(prevState, {
             name: null,
         });
 
-        return Object.assign(state, {
-            mrw: {
-                wrapped_state: { rooms: { [roomId]: newState } },
-                wrapped_api: state.mrw.wrapped_api,
-            },
+        return Object.assign(wrappedState, {
+            rooms: { [roomId]: newState },
         });
     }
     case 'Room.name': {
         const roomId = action.event.getRoomId();
         const prevState = Object.assign(
             {},
-            state.mrw.wrapped_state.rooms[roomId] || {},
+            wrappedState.rooms[roomId] || {},
         );
 
         const newState = Object.assign(prevState, {
             name: action.event.getContent().name,
         });
 
-        return Object.assign(state, {
-            mrw: {
-                wrapped_state: { rooms: { [roomId]: newState } },
-                wrapped_api: state.mrw.wrapped_api,
-            },
+        return Object.assign(wrappedState, {
+            rooms: { [roomId]: newState },
         });
     }
     default:
-        return state;
+        return wrappedState;
     }
 }
 
 function initialState() {
     return { mrw: { wrapped_api: {}, wrapped_state: { rooms: {} } } };
 }
+
+const getInObj = (obj, path) =>
+    (path.reduce((value, el) => value[el], obj));
+
+const setInObj = (obj, pathItems, value) => {
+    if (pathItems.length === 1) {
+        const pathItem = pathItems.shift();
+        return Object.assign(
+            obj,
+            { [pathItem]: value },
+        );
+    }
+    const pathItem = pathItems.shift();
+
+    return Object.assign(obj, {
+        [pathItem]: setInObj(obj[pathItem], pathItems, value),
+    });
+};
 
 function MatrixReducer(action, state) {
     if (action === undefined) {
@@ -117,14 +125,26 @@ function MatrixReducer(action, state) {
 
     // path[0]: 'wrapped_event' OR 'wrapped_api'
 
-    switch (path[0]) {
-    case 'wrapped_event':
-        return reduceWrappedEventAction(action, state);
-    case 'wrapped_api':
-        return reduceWrappedAPIAction(action, path, state);
-    default:
+    const subReducer = {
+        wrapped_event: {
+            statePath: ['mrw', 'wrapped_state'],
+            reduceFn: reduceWrappedEventAction,
+        },
+        wrapped_api: {
+            statePath: ['mrw', 'wrapped_api'],
+            reduceFn: reduceWrappedAPIAction,
+        },
+    }[path[0]];
+
+    if (!subReducer) {
         throw new Error(`Unsupported mrw type ${path[0]}`);
     }
+
+    const oldState = getInObj(state, subReducer.statePath);
+
+    const newState = subReducer.reduceFn(action, path, oldState);
+
+    return setInObj(state, subReducer.statePath, newState);
 }
 
 module.exports = {

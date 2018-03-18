@@ -224,18 +224,14 @@ describe('the matrix redux wrap reducer', () => {
         });
 
         it('updates room names', () => {
+            const namedRoom = new Room('!myroomid');
+            namedRoom.name = 'This is a room name';
             const actions = [
                 undefined,
                 createWrappedEventAction(
                     'Room.name',
                     {
-                        event: new MatrixEvent({
-                            type: 'm.room.name',
-                            content: {
-                                name: 'This is a room name',
-                            },
-                            room_id: '!myroomid',
-                        }),
+                        room: namedRoom,
                     },
                 ),
             ];
@@ -254,6 +250,8 @@ describe('the matrix redux wrap reducer', () => {
         });
 
         it('handles a new room followed by a room name change', () => {
+            const namedRoom = new Room('!myroomid');
+            namedRoom.name = 'This is a room name';
             const actions = [
                 undefined,
                 createWrappedEventAction(
@@ -265,13 +263,7 @@ describe('the matrix redux wrap reducer', () => {
                 createWrappedEventAction(
                     'Room.name',
                     {
-                        event: new MatrixEvent({
-                            type: 'm.room.name',
-                            content: {
-                                name: 'This is a room name',
-                            },
-                            room_id: '!myroomid',
-                        }),
+                        room: namedRoom,
                     },
                 ),
             ];
@@ -290,6 +282,10 @@ describe('the matrix redux wrap reducer', () => {
         });
 
         it('handles a new room followed by two room name changes', () => {
+            const namedRoom = new Room('!myroomid');
+            namedRoom.name = 'This is a room name';
+            const secondNamedRoom = new Room('!myroomid');
+            secondNamedRoom.name = 'Some other crazy name';
             const actions = [
                 undefined,
                 createWrappedEventAction(
@@ -301,25 +297,13 @@ describe('the matrix redux wrap reducer', () => {
                 createWrappedEventAction(
                     'Room.name',
                     {
-                        event: new MatrixEvent({
-                            type: 'm.room.name',
-                            content: {
-                                name: 'This is a room name',
-                            },
-                            room_id: '!myroomid',
-                        }),
+                        room: namedRoom,
                     },
                 ),
                 createWrappedEventAction(
                     'Room.name',
                     {
-                        event: new MatrixEvent({
-                            type: 'm.room.name',
-                            content: {
-                                name: 'Some other crazy name',
-                            },
-                            room_id: '!myroomid',
-                        }),
+                        room: secondNamedRoom,
                     },
                 ),
             ];

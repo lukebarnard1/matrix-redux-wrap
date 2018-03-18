@@ -90,14 +90,14 @@ function reduceWrappedEventAction(action, path, wrappedState) {
         return setInObj(wrappedState, ['rooms', roomId], newState);
     }
     case 'Room.name': {
-        const roomId = action.event.getRoomId();
+        const { roomId } = action.room;
         const prevState = Object.assign(
             {},
             wrappedState.rooms[roomId] || {},
         );
 
         const newState = Object.assign(prevState, {
-            name: action.event.getContent().name,
+            name: action.room.name,
         });
 
         return Object.assign(wrappedState, {

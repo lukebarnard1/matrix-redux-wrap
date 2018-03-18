@@ -190,6 +190,39 @@ describe('the matrix redux wrap reducer', () => {
             });
         });
 
+        it('handles multiple new rooms sent to the client', () => {
+            const actions = [
+                undefined,
+                createWrappedEventAction(
+                    'Room',
+                    {
+                        room: new Room('!myroomid'),
+                    },
+                ),
+                createWrappedEventAction(
+                    'Room',
+                    {
+                        room: new Room('!someotherroomid'),
+                    },
+                ),
+            ];
+            runActionsAndExpectState(actions, {
+                mrw: {
+                    wrapped_api: {},
+                    wrapped_state: {
+                        rooms: {
+                            '!myroomid': {
+                                name: null,
+                            },
+                            '!someotherroomid': {
+                                name: null,
+                            },
+                        },
+                    },
+                },
+            });
+        });
+
         it('updates room names', () => {
             const actions = [
                 undefined,

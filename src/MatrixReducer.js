@@ -16,6 +16,24 @@ limitations under the License.
 
 */
 
+const getInObj = (obj, path) =>
+    (path.reduce((value, el) => value[el], obj));
+
+const setInObj = (obj, pathItems, value) => {
+    if (pathItems.length === 1) {
+        const pathItem = pathItems.shift();
+        return Object.assign(
+            obj,
+            { [pathItem]: value },
+        );
+    }
+    const pathItem = pathItems.shift();
+
+    return Object.assign(obj, {
+        [pathItem]: setInObj(obj[pathItem], pathItems, value),
+    });
+};
+
 function isMatrixReduxAction(action) {
     return action &&
         action.type && typeof action.type === 'string' &&
@@ -69,9 +87,7 @@ function reduceWrappedEventAction(action, path, wrappedState) {
             name: null,
         });
 
-        return Object.assign(wrappedState, {
-            rooms: { [roomId]: newState },
-        });
+        return setInObj(wrappedState, ['rooms', roomId], newState);
     }
     case 'Room.name': {
         const roomId = action.event.getRoomId();
@@ -96,24 +112,6 @@ function reduceWrappedEventAction(action, path, wrappedState) {
 function initialState() {
     return { mrw: { wrapped_api: {}, wrapped_state: { rooms: {} } } };
 }
-
-const getInObj = (obj, path) =>
-    (path.reduce((value, el) => value[el], obj));
-
-const setInObj = (obj, pathItems, value) => {
-    if (pathItems.length === 1) {
-        const pathItem = pathItems.shift();
-        return Object.assign(
-            obj,
-            { [pathItem]: value },
-        );
-    }
-    const pathItem = pathItems.shift();
-
-    return Object.assign(obj, {
-        [pathItem]: setInObj(obj[pathItem], pathItems, value),
-    });
-};
 
 function MatrixReducer(action, state) {
     if (action === undefined) {

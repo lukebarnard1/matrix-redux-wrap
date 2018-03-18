@@ -21,8 +21,8 @@ const Matrix = require('matrix-js-sdk');
 
 // Define Async Action Creators
 
-function createWrappedEventAction(eventType, args) {
-    return { type: 'mrw.wrapped_event', eventType, ...args };
+function createWrappedEventAction(emittedType, emittedArgs) {
+    return { type: 'mrw.wrapped_event', emittedType, emittedArgs };
 }
 
 // Log a user into their matrix account and start syncing

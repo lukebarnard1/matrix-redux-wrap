@@ -75,9 +75,9 @@ function reduceWrappedAPIAction(action, path, state) {
 }
 
 function reduceWrappedEventAction(action, path, wrappedState) {
-    switch (action.eventType) {
+    switch (action.emittedType) {
     case 'Room': {
-        const { roomId } = action.room;
+        const { roomId } = action.emittedArgs.room;
         const newState = Object.assign(
             {},
             wrappedState.rooms[roomId] || {
@@ -88,7 +88,7 @@ function reduceWrappedEventAction(action, path, wrappedState) {
         return setInObj(wrappedState, ['rooms', roomId], newState);
     }
     case 'Room.name': {
-        const { roomId } = action.room;
+        const { roomId } = action.emittedArgs.room;
         const prevState = Object.assign(
             {},
             wrappedState.rooms[roomId] || {
@@ -97,7 +97,7 @@ function reduceWrappedEventAction(action, path, wrappedState) {
         );
 
         const newState = Object.assign(prevState, {
-            name: action.room.name,
+            name: action.emittedArgs.room.name,
         });
 
         return setInObj(wrappedState, ['rooms', roomId], newState);

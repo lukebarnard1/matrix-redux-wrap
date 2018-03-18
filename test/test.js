@@ -52,8 +52,8 @@ function createWrappedAPIActions(method, pendingState) {
     };
 }
 
-function createWrappedEventAction(eventType, args) {
-    return { type: 'mrw.wrapped_event', eventType, ...args };
+function createWrappedEventAction(emittedType, emittedArgs) {
+    return { type: 'mrw.wrapped_event', emittedType, emittedArgs };
 }
 
 describe('the matrix redux wrap reducer', () => {

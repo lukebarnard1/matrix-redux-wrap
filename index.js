@@ -16,9 +16,9 @@ limitations under the License.
 
 */
 
-const matrixReduce = require('./matrixReduce.js');
+const matrixReduce = require('./src/matrixReduce.js');
 
-const { asyncAction } = require('./wrappedAPI.js');
+const { asyncAction } = require('./src/wrappedAPI.js');
 
 module.exports = {
     asyncAction,

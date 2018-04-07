@@ -98,9 +98,10 @@ function render(state) {
             '\n    [ Rooms ]',
             ...Object.keys(state.mrw.wrapped_state.rooms)
                 .map((k) => {
-                    const { name, members } = state.mrw.wrapped_state.rooms[k];
+                    const { name, members, timeline } = state.mrw.wrapped_state.rooms[k];
                     const memberCount = Object.keys(members).length;
-                    return `${name}: ${memberCount} members`;
+                    const eventCount = timeline ? timeline.length : '???';
+                    return `${name}: ${memberCount} members, ${eventCount} events`;
                 }).slice(0, 5),
         ].join(' \n      - ');
     }

@@ -151,6 +151,7 @@ describe('the matrix redux wrap reducer', () => {
                             '!myroomid': {
                                 members: {},
                                 name: null,
+                                timeline: [],
                             },
                         },
                         sync: {},
@@ -174,6 +175,7 @@ describe('the matrix redux wrap reducer', () => {
                             '!myroomid': {
                                 members: {},
                                 name: null,
+                                timeline: [],
                             },
                         },
                         sync: {},
@@ -196,10 +198,12 @@ describe('the matrix redux wrap reducer', () => {
                             '!myroomid': {
                                 members: {},
                                 name: null,
+                                timeline: [],
                             },
                             '!someotherroomid': {
                                 members: {},
                                 name: null,
+                                timeline: [],
                             },
                         },
                         sync: {},
@@ -223,6 +227,7 @@ describe('the matrix redux wrap reducer', () => {
                             '!myroomid': {
                                 members: {},
                                 name: 'This is a room name',
+                                timeline: [],
                             },
                         },
                         sync: {},
@@ -247,6 +252,7 @@ describe('the matrix redux wrap reducer', () => {
                             '!myroomid': {
                                 members: {},
                                 name: 'This is a room name',
+                                timeline: [],
                             },
                         },
                         sync: {},
@@ -271,6 +277,7 @@ describe('the matrix redux wrap reducer', () => {
                             '!myroomid': {
                                 members: {},
                                 name: 'This is a room name',
+                                timeline: [],
                             },
                         },
                         sync: {},
@@ -298,6 +305,7 @@ describe('the matrix redux wrap reducer', () => {
                             '!myroomid': {
                                 members: {},
                                 name: 'Some other crazy name',
+                                timeline: [],
                             },
                         },
                         sync: {},
@@ -331,6 +339,7 @@ describe('the matrix redux wrap reducer', () => {
                             '!myroomid': {
                                 members: {},
                                 name: null,
+                                timeline: [],
                             },
                         },
                         sync: {},
@@ -379,6 +388,7 @@ describe('the matrix redux wrap reducer', () => {
                         rooms: {
                             '!myroomid': {
                                 name: null,
+                                timeline: [],
                                 members: {
                                     '@userid:domain': {
                                         membership: 'join',
@@ -424,6 +434,7 @@ describe('the matrix redux wrap reducer', () => {
                         rooms: {
                             '!myroomid': {
                                 name: null,
+                                timeline: [],
                                 members: {
                                     '@userid:domain': {
                                         membership: 'join',
@@ -472,6 +483,7 @@ describe('the matrix redux wrap reducer', () => {
                         rooms: {
                             '!myroomid': {
                                 name: null,
+                                timeline: [],
                                 members: {
                                     '@userid1:domain': {
                                         membership: 'join',

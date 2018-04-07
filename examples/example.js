@@ -44,7 +44,7 @@ function doLoginAndSync(mxClient, baseUrl, user, password) {
                 userId: resp.user_id,
                 accessToken: resp.access_token,
             });
-            wrapSyncingClient(syncClient);
+            wrapSyncingClient(syncClient, dis);
             syncClient.startClient();
 
             console.info('-----------will log out in 20s-----------');

@@ -16,16 +16,13 @@ limitations under the License.
 
 */
 
-const { matrixReduce, asyncAction } = require('../index.js');
+const { matrixReduce, asyncAction, wrapSyncingClient } = require('../index.js');
 const Matrix = require('matrix-js-sdk');
 
 const readline = require('readline');
 
 // Define Async Action Creators
 
-function createWrappedEventAction(emittedType, emittedArgs) {
-    return { type: 'mrw.wrapped_event', emittedType, emittedArgs };
-}
 
 function doLogout(mxClient) {
     return asyncAction('logoutState', mxClient.logout());
@@ -47,18 +44,7 @@ function doLoginAndSync(mxClient, baseUrl, user, password) {
                 userId: resp.user_id,
                 accessToken: resp.access_token,
             });
-            syncClient.on('Room', (room) => {
-                dis(createWrappedEventAction('Room', { room }));
-            });
-            syncClient.on('Room.name', (room) => {
-                dis(createWrappedEventAction('Room.name', { room }));
-            });
-            syncClient.on('RoomMember.membership', (event, member) => {
-                dis(createWrappedEventAction('RoomMember.membership', { event, member }));
-            });
-            syncClient.on('RoomMember.name', (event, member) => {
-                dis(createWrappedEventAction('RoomMember.name', { event, member }));
-            });
+            wrapSyncingClient(syncClient);
             syncClient.startClient();
 
             console.info('-----------will log out in 20s-----------');

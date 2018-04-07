@@ -18,6 +18,8 @@ limitations under the License.
 */
 
 const { matrixReduce } = require('../index.js');
+const { createWrappedEventAction } = require('../src/wrappedSync.js');
+
 const { expect } = require('chai');
 
 const { MatrixEvent, Room, RoomMember } = require('matrix-js-sdk');
@@ -50,10 +52,6 @@ function createWrappedAPIActions(method, pendingState) {
             return actions;
         },
     };
-}
-
-function createWrappedEventAction(emittedType, emittedArgs) {
-    return { type: 'mrw.wrapped_event', emittedType, emittedArgs };
 }
 
 describe('the matrix redux wrap reducer', () => {
@@ -131,12 +129,7 @@ describe('the matrix redux wrap reducer', () => {
         it('doesn\'t affect the wrapped_event state', () => {
             const actions = [
                 undefined,
-                createWrappedEventAction(
-                    'Room',
-                    {
-                        room: new Room('!myroomid'),
-                    },
-                ),
+                createWrappedEventAction('Room', [new Room('!myroomid')]),
                 ...createWrappedAPIActions('some_promise_api', [12345]).succeed({
                     result: 'some result',
                 }),
@@ -171,12 +164,7 @@ describe('the matrix redux wrap reducer', () => {
         it('handles new rooms sent to the client', () => {
             const actions = [
                 undefined,
-                createWrappedEventAction(
-                    'Room',
-                    {
-                        room: new Room('!myroomid'),
-                    },
-                ),
+                createWrappedEventAction('Room', [new Room('!myroomid')]),
             ];
             runActionsAndExpectState(actions, {
                 mrw: {
@@ -197,18 +185,8 @@ describe('the matrix redux wrap reducer', () => {
         it('handles multiple new rooms sent to the client', () => {
             const actions = [
                 undefined,
-                createWrappedEventAction(
-                    'Room',
-                    {
-                        room: new Room('!myroomid'),
-                    },
-                ),
-                createWrappedEventAction(
-                    'Room',
-                    {
-                        room: new Room('!someotherroomid'),
-                    },
-                ),
+                createWrappedEventAction('Room', [new Room('!myroomid')]),
+                createWrappedEventAction('Room', [new Room('!someotherroomid')]),
             ];
             runActionsAndExpectState(actions, {
                 mrw: {
@@ -235,12 +213,7 @@ describe('the matrix redux wrap reducer', () => {
             namedRoom.name = 'This is a room name';
             const actions = [
                 undefined,
-                createWrappedEventAction(
-                    'Room.name',
-                    {
-                        room: namedRoom,
-                    },
-                ),
+                createWrappedEventAction('Room.name', [namedRoom]),
             ];
             runActionsAndExpectState(actions, {
                 mrw: {
@@ -263,18 +236,8 @@ describe('the matrix redux wrap reducer', () => {
             namedRoom.name = 'This is a room name';
             const actions = [
                 undefined,
-                createWrappedEventAction(
-                    'Room',
-                    {
-                        room: new Room('!myroomid'),
-                    },
-                ),
-                createWrappedEventAction(
-                    'Room.name',
-                    {
-                        room: namedRoom,
-                    },
-                ),
+                createWrappedEventAction('Room', [new Room('!myroomid')]),
+                createWrappedEventAction('Room.name', [namedRoom]),
             ];
             runActionsAndExpectState(actions, {
                 mrw: {
@@ -297,18 +260,8 @@ describe('the matrix redux wrap reducer', () => {
             namedRoom.name = 'This is a room name';
             const actions = [
                 undefined,
-                createWrappedEventAction(
-                    'Room.name',
-                    {
-                        room: namedRoom,
-                    },
-                ),
-                createWrappedEventAction(
-                    'Room',
-                    {
-                        room: new Room('!myroomid'),
-                    },
-                ),
+                createWrappedEventAction('Room.name', [namedRoom]),
+                createWrappedEventAction('Room', [new Room('!myroomid')]),
             ];
             runActionsAndExpectState(actions, {
                 mrw: {
@@ -333,24 +286,9 @@ describe('the matrix redux wrap reducer', () => {
             secondNamedRoom.name = 'Some other crazy name';
             const actions = [
                 undefined,
-                createWrappedEventAction(
-                    'Room',
-                    {
-                        room: new Room('!myroomid'),
-                    },
-                ),
-                createWrappedEventAction(
-                    'Room.name',
-                    {
-                        room: namedRoom,
-                    },
-                ),
-                createWrappedEventAction(
-                    'Room.name',
-                    {
-                        room: secondNamedRoom,
-                    },
-                ),
+                createWrappedEventAction('Room', [new Room('!myroomid')]),
+                createWrappedEventAction('Room.name', [namedRoom]),
+                createWrappedEventAction('Room.name', [secondNamedRoom]),
             ];
             runActionsAndExpectState(actions, {
                 mrw: {
@@ -374,12 +312,7 @@ describe('the matrix redux wrap reducer', () => {
                 ...createWrappedAPIActions('some_promise_api', [12345]).succeed({
                     result: 'some result',
                 }),
-                createWrappedEventAction(
-                    'Room',
-                    {
-                        room: new Room('!myroomid'),
-                    },
-                ),
+                createWrappedEventAction('Room', [new Room('!myroomid')]),
             ];
             runActionsAndExpectState(actions, {
                 mrw: {
@@ -409,12 +342,7 @@ describe('the matrix redux wrap reducer', () => {
         it('tracks sync state', () => {
             const actions = [
                 undefined,
-                createWrappedEventAction(
-                    'sync',
-                    {
-                        state: 'SYNCING',
-                    },
-                ),
+                createWrappedEventAction('sync', ['SYNCING']),
             ];
             runActionsAndExpectState(actions, {
                 mrw: {
@@ -441,19 +369,8 @@ describe('the matrix redux wrap reducer', () => {
             member.setMembershipEvent(event);
             const actions = [
                 undefined,
-                createWrappedEventAction(
-                    'Room',
-                    {
-                        room: new Room('!myroomid'),
-                    },
-                ),
-                createWrappedEventAction(
-                    'RoomMember.membership',
-                    {
-                        event,
-                        member,
-                    },
-                ),
+                createWrappedEventAction('Room', [new Room('!myroomid')]),
+                createWrappedEventAction('RoomMember.membership', [event, member]),
             ];
             runActionsAndExpectState(actions, {
                 mrw: {
@@ -496,26 +413,9 @@ describe('the matrix redux wrap reducer', () => {
             member.setMembershipEvent(nameEvent);
             const actions = [
                 undefined,
-                createWrappedEventAction(
-                    'Room',
-                    {
-                        room: new Room('!myroomid'),
-                    },
-                ),
-                createWrappedEventAction(
-                    'RoomMember.membership',
-                    {
-                        event,
-                        member,
-                    },
-                ),
-                createWrappedEventAction(
-                    'RoomMember.name',
-                    {
-                        event: nameEvent,
-                        member,
-                    },
-                ),
+                createWrappedEventAction('Room', [new Room('!myroomid')]),
+                createWrappedEventAction('RoomMember.membership', [event, member]),
+                createWrappedEventAction('RoomMember.name', [nameEvent, member]),
             ];
             runActionsAndExpectState(actions, {
                 mrw: {
@@ -561,26 +461,9 @@ describe('the matrix redux wrap reducer', () => {
             memberB.setMembershipEvent(eventB);
             const actions = [
                 undefined,
-                createWrappedEventAction(
-                    'Room',
-                    {
-                        room: new Room('!myroomid'),
-                    },
-                ),
-                createWrappedEventAction(
-                    'RoomMember.membership',
-                    {
-                        event: eventA,
-                        member: memberA,
-                    },
-                ),
-                createWrappedEventAction(
-                    'RoomMember.membership',
-                    {
-                        event: eventB,
-                        member: memberB,
-                    },
-                ),
+                createWrappedEventAction('Room', [new Room('!myroomid')]),
+                createWrappedEventAction('RoomMember.membership', [eventA, memberA]),
+                createWrappedEventAction('RoomMember.membership', [eventB, memberB]),
             ];
             runActionsAndExpectState(actions, {
                 mrw: {

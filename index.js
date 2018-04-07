@@ -20,7 +20,10 @@ const matrixReduce = require('./src/matrixReduce.js');
 
 const { asyncAction } = require('./src/wrappedAPI.js');
 
+const { wrapSyncingClient } = require('./src/wrappedSync.js');
+
 module.exports = {
     asyncAction,
     matrixReduce,
+    wrapSyncingClient,
 };

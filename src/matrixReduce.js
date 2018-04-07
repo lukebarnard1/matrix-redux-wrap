@@ -84,7 +84,7 @@ function reduceWrappedEventAction(action, path, wrappedState) {
         );
     }
     case 'Room': {
-        const { roomId } = action.emittedArgs.room;
+        const { roomId } = action.emittedArgs;
         const newState = Object.assign(
             {},
             wrappedState.rooms[roomId] || {
@@ -96,7 +96,7 @@ function reduceWrappedEventAction(action, path, wrappedState) {
         return setInObj(wrappedState, ['rooms', roomId], newState);
     }
     case 'Room.name': {
-        const { roomId } = action.emittedArgs.room;
+        const { roomId, name } = action.emittedArgs;
         const prevState = Object.assign(
             {},
             wrappedState.rooms[roomId] || {
@@ -105,36 +105,28 @@ function reduceWrappedEventAction(action, path, wrappedState) {
             },
         );
 
-        const newState = Object.assign(prevState, {
-            name: action.emittedArgs.room.name,
-        });
+        const newState = Object.assign(prevState, { name });
 
         return setInObj(wrappedState, ['rooms', roomId], newState);
     }
     case 'RoomMember.membership': {
-        const { event, member } = action.emittedArgs;
-        const roomId = event.getRoomId();
-        const { userId } = member;
+        const {
+            roomId,
+            membership,
+            name,
+            userId,
+        } = action.emittedArgs;
 
-        return setInObj(
-            wrappedState,
-            ['rooms', roomId, 'members', userId],
-            {
-                membership: member.membership,
-                name: member.name,
-            },
-        );
+        return setInObj(wrappedState, ['rooms', roomId, 'members', userId], { membership, name });
     }
     case 'RoomMember.name': {
-        const { event, member } = action.emittedArgs;
-        const roomId = event.getRoomId();
-        const { userId } = member;
+        const {
+            roomId,
+            userId,
+            name,
+        } = action.emittedArgs;
 
-        return setInObj(
-            wrappedState,
-            ['rooms', roomId, 'members', userId, 'name'],
-            member.name,
-        );
+        return setInObj(wrappedState, ['rooms', roomId, 'members', userId, 'name'], name);
     }
     default:
         return wrappedState;

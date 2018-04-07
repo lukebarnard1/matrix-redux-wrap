@@ -21,40 +21,7 @@ const Matrix = require('matrix-js-sdk');
 
 const readline = require('readline');
 
-// Define Async Action Creators
-
-
-function doLogout(mxClient) {
-    return asyncAction('logoutState', mxClient.logout());
-}
-
-// Log a user into their matrix account and start syncing
-function doLoginAndSync(mxClient, baseUrl, user, password) {
-    return (dis) => {
-        // Call to the matrix-js-sdk login API
-        const promise = mxClient.login('m.login.password', { user, password });
-
-        // Action-ify this promise
-        asyncAction('loginState', promise, { user })(dis);
-
-        promise.then((resp) => {
-            // Create a new matrix client for syncing with the server
-            const syncClient = Matrix.createClient({
-                baseUrl,
-                userId: resp.user_id,
-                accessToken: resp.access_token,
-            });
-            wrapSyncingClient(syncClient, dis);
-            syncClient.startClient();
-
-            console.info('-----------will log out in 20s-----------');
-            setTimeout(() => {
-                syncClient.stopClient();
-                doLogout(syncClient)(dis);
-            }, 20000);
-        });
-    };
-}
+// A super simple app
 
 // A simple render function
 function render(state) {
@@ -63,6 +30,7 @@ function render(state) {
     const {
         loginState,
         logoutState,
+        scrollback,
     } = state.mrw.wrapped_api;
 
     if (!loginState) {
@@ -89,6 +57,10 @@ function render(state) {
             `  [ You failed to log in, ${user}!  ⤫ ]`;
     }
 
+    if (scrollback) {
+        view += scrollback.loading ? '...scrolling' : 'scroll done';
+    }
+
     let roomView = '';
 
     if (state.mrw.wrapped_state.rooms &&
@@ -109,7 +81,6 @@ function render(state) {
     return `${view}${roomView}`;
 }
 
-// A super simple app
 let state = {};
 let view = '';
 let nextView = '';
@@ -123,6 +94,51 @@ function dispatch(action) {
         view = nextView;
         console.info(`${view}`);
     }
+}
+
+// Define Async Action Creators
+
+function doLogout(mxClient) {
+    return asyncAction('logoutState', mxClient.logout());
+}
+
+function doScrollback(mxClient, roomId) {
+    const room = mxClient.getRoom(roomId);
+    return asyncAction('scrollback', mxClient.scrollback(room));
+}
+
+// Log a user into their matrix account and start syncing
+function doLoginAndSync(mxClient, baseUrl, user, password) {
+    return (dis) => {
+        // Call to the matrix-js-sdk login API
+        const promise = mxClient.login('m.login.password', { user, password });
+
+        // Action-ify this promise
+        asyncAction('loginState', promise, { user })(dis);
+
+        promise.then((resp) => {
+            // Create a new matrix client for syncing with the server
+            const syncClient = Matrix.createClient({
+                baseUrl,
+                userId: resp.user_id,
+                accessToken: resp.access_token,
+            });
+            wrapSyncingClient(syncClient, dis);
+            syncClient.startClient();
+
+            // XXX: This is a bit horrible, maybe the user can be shown a UI for this?
+            console.info('-----------will scroll in 20s-----------');
+            setTimeout(() => {
+                console.info('-----------doing scrollback--------------');
+                doScrollback(syncClient, Object.keys(state.mrw.wrapped_state.rooms)[0])(dis);
+            }, 20000);
+            console.info('-----------will log out in 30s-----------');
+            setTimeout(() => {
+                syncClient.stopClient();
+                doLogout(syncClient)(dis);
+            }, 30000);
+        });
+    };
 }
 
 console.info();

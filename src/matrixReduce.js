@@ -131,14 +131,19 @@ function reduceWrappedEventAction(action, path, wrappedState) {
         return setInObj(wrappedState, ['rooms', roomId, 'members', userId, 'name'], name);
     }
     case 'Room.timeline': {
-        const { roomId } = action.emittedArgs;
+        const {
+            roomId,
+            content,
+            ts,
+            sender,
+        } = action.emittedArgs;
 
         const timeline = getInObj(wrappedState, ['rooms', roomId, 'timeline']) || [];
 
         return setInObj(
             wrappedState,
             ['rooms', roomId, 'timeline'],
-            [...timeline, { roomId }],
+            [...timeline, { content, ts, sender }],
         );
     }
     default:

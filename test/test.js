@@ -501,5 +501,91 @@ describe('the matrix redux wrap reducer', () => {
                 },
             });
         });
+
+        it('inserts events into the timeline', () => {
+            const event = new MatrixEvent({
+                room_id: '!myroomid',
+                type: 'm.room.message',
+                content: {
+                    body: 'Hello, world!',
+                },
+                sender: '@userid:domain',
+                origin_server_ts: 12345,
+            });
+            const actions = [
+                undefined,
+                createWrappedEventAction('Room', [new Room('!myroomid')]),
+                createWrappedEventAction('Room.timeline', [event]),
+            ];
+            runActionsAndExpectState(actions, {
+                mrw: {
+                    wrapped_api: {},
+                    wrapped_state: {
+                        rooms: {
+                            '!myroomid': {
+                                members: {},
+                                name: null,
+                                timeline: [{
+                                    content: { body: 'Hello, world!' },
+                                    sender: '@userid:domain',
+                                    ts: 12345,
+                                }],
+                            },
+                        },
+                        sync: {},
+                    },
+                },
+            });
+        });
+
+        it('inserts multiple events into the timeline', () => {
+            const eventA = new MatrixEvent({
+                room_id: '!myroomid',
+                type: 'm.room.message',
+                content: {
+                    body: 'Hello, world!',
+                },
+                sender: '@userid:domain',
+                origin_server_ts: 12345,
+            });
+            const eventB = new MatrixEvent({
+                room_id: '!myroomid',
+                type: 'm.room.message',
+                content: {
+                    body: 'Hello (again), world!',
+                },
+                sender: '@userid:domain',
+                origin_server_ts: 123456,
+            });
+            const actions = [
+                undefined,
+                createWrappedEventAction('Room', [new Room('!myroomid')]),
+                createWrappedEventAction('Room.timeline', [eventA]),
+                createWrappedEventAction('Room.timeline', [eventB]),
+            ];
+            runActionsAndExpectState(actions, {
+                mrw: {
+                    wrapped_api: {},
+                    wrapped_state: {
+                        rooms: {
+                            '!myroomid': {
+                                members: {},
+                                name: null,
+                                timeline: [{
+                                    content: { body: 'Hello, world!' },
+                                    sender: '@userid:domain',
+                                    ts: 12345,
+                                }, {
+                                    content: { body: 'Hello (again), world!' },
+                                    sender: '@userid:domain',
+                                    ts: 123456,
+                                }],
+                            },
+                        },
+                        sync: {},
+                    },
+                },
+            });
+        });
     });
 });

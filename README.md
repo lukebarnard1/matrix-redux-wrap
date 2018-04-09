@@ -122,3 +122,44 @@ This creates actions of the following shape:
 `matrixReduce` can be used to reduce these actions to the current state of the matrix client
 as exposed in the state under the `mrw` key.
 
+### `matrixReduce(action, state) => newState`
+Reduces state according to the `mrw.*` action passed, returning the new state. The state has
+the following structure:
+```js
+{
+  mrw: {
+    wrapped_api: {
+      login: {
+        loading: false,
+        status: 'success',
+        pendingState: ['username', 'password'],
+        lastResult: {
+          access_token: '12345',
+        },
+      },
+    },
+    wrapped_state: {
+      rooms: {
+        '!myroomid': {
+          members: {
+            '@m0rph3us:the.matrix': {
+              membership: 'join',
+              name: 'Morpheus',
+            }
+          },
+          name: "Some room name",
+          timeline: [{
+              content: { body: 'Hello, world!' },
+              sender: '@userid:domain',
+              ts: 12345,
+          }, {
+              content: { body: 'Hello (again), world!' },
+              sender: '@userid:domain',
+              ts: 123456,
+          }]
+        },
+      },
+      sync: {}
+    }
+}
+```

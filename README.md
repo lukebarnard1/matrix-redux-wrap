@@ -52,6 +52,8 @@ You are in 1234 rooms
 ```
 
 ## Documentation
+Below is a quick explanation of the provided API for using matrix-redux-wrap. 
+For full examples of how these functions can be used, see the [examples directory](/examples).
 
 ### `asyncAction(stateKey, promise) => (dispatch) => {...}`
 Returns a function that calls the `dispatch` argument asyncronously as such:

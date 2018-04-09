@@ -105,3 +105,20 @@ Each of these have different fields present and all can be passed to
  - `method`, `id`: see above
  - `error`: the value that the `promise` was rejected with
 
+### `wrapSyncingClient(matrixClient) => void`
+When given a `matrix-js-sdk` MatrixClient instance, it will dispatch an action for each event
+emitted by the instance, taking certain keys from the event, assigning them to fields on the
+action. Once a client instance is passed to the function, the caller calls `startClient` to 
+start the long-polling process that will cause the instance to emit events.
+
+This creates actions of the following shape:
+```js
+{
+  type: 'mrw.wrapped_event',
+  emittedType: 'Room.timeline',
+  emittedArgs: wrappedArgs,
+}
+```
+`matrixReduce` can be used to reduce these actions to the current state of the matrix client
+as exposed in the state under the `mrw` key.
+

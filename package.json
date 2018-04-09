@@ -24,7 +24,7 @@
     "url": "git+https://github.com/lukebarnard1/matrix-redux-wrap.git"
   },
   "author": "Luke Barnard <me@lukebarnard.co.uk>",
-  "license": "ISC",
+  "license": "Apache-2.0",
   "bugs": {
     "url": "https://github.com/lukebarnard1/matrix-redux-wrap/issues"
   },

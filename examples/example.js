@@ -70,10 +70,17 @@ function render(state) {
             '\n    [ Rooms ]',
             ...Object.keys(state.mrw.wrapped_state.rooms)
                 .map((k) => {
-                    const { name, members, timeline } = state.mrw.wrapped_state.rooms[k];
+                    const {
+                        name,
+                        members,
+                        timeline,
+                    } = state.mrw.wrapped_state.rooms[k];
+                    const roomState = state.mrw.wrapped_state.rooms[k].state;
+
                     const memberCount = Object.keys(members).length;
                     const eventCount = timeline ? timeline.length : '???';
-                    return `${name}: ${memberCount} members, ${eventCount} events`;
+                    const topic = roomState['m.room.topic'] ? roomState['m.room.topic'][''].content.topic : '';
+                    return `${name}: ${topic} ${memberCount} members, ${eventCount} events`;
                 }).slice(0, 5),
         ].join(' \n      - ');
     }

@@ -91,6 +91,7 @@ function reduceWrappedEventAction(action, path, wrappedState) {
                 name: null,
                 members: {},
                 timeline: [],
+                state: {},
             },
         );
 
@@ -104,12 +105,41 @@ function reduceWrappedEventAction(action, path, wrappedState) {
                 name: null,
                 members: {},
                 timeline: [],
+                state: {},
             },
         );
 
         const newState = Object.assign(prevState, { name });
 
         return setInObj(wrappedState, ['rooms', roomId], newState);
+    }
+    case 'RoomState.events': {
+        const {
+            roomId,
+            type,
+            content,
+            ts,
+            sender,
+            stateKey,
+        } = action.emittedArgs;
+        const prevState = Object.assign(
+            {},
+            wrappedState.rooms[roomId] || {
+                name: null,
+                members: {},
+                timeline: [],
+                state: {},
+            },
+        );
+
+        prevState.state = setInObj(prevState.state, [type, stateKey], {
+            type,
+            content,
+            sender,
+            ts,
+        });
+
+        return setInObj(wrappedState, ['rooms', roomId], prevState);
     }
     case 'RoomMember.membership': {
         const {

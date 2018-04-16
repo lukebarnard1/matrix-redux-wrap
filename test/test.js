@@ -152,6 +152,7 @@ describe('the matrix redux wrap reducer', () => {
                                 members: {},
                                 name: null,
                                 timeline: [],
+                                state: {},
                             },
                         },
                         sync: {},
@@ -176,6 +177,7 @@ describe('the matrix redux wrap reducer', () => {
                                 members: {},
                                 name: null,
                                 timeline: [],
+                                state: {},
                             },
                         },
                         sync: {},
@@ -199,11 +201,13 @@ describe('the matrix redux wrap reducer', () => {
                                 members: {},
                                 name: null,
                                 timeline: [],
+                                state: {},
                             },
                             '!someotherroomid': {
                                 members: {},
                                 name: null,
                                 timeline: [],
+                                state: {},
                             },
                         },
                         sync: {},
@@ -228,6 +232,7 @@ describe('the matrix redux wrap reducer', () => {
                                 members: {},
                                 name: 'This is a room name',
                                 timeline: [],
+                                state: {},
                             },
                         },
                         sync: {},
@@ -253,6 +258,7 @@ describe('the matrix redux wrap reducer', () => {
                                 members: {},
                                 name: 'This is a room name',
                                 timeline: [],
+                                state: {},
                             },
                         },
                         sync: {},
@@ -278,6 +284,7 @@ describe('the matrix redux wrap reducer', () => {
                                 members: {},
                                 name: 'This is a room name',
                                 timeline: [],
+                                state: {},
                             },
                         },
                         sync: {},
@@ -306,6 +313,7 @@ describe('the matrix redux wrap reducer', () => {
                                 members: {},
                                 name: 'Some other crazy name',
                                 timeline: [],
+                                state: {},
                             },
                         },
                         sync: {},
@@ -340,6 +348,7 @@ describe('the matrix redux wrap reducer', () => {
                                 members: {},
                                 name: null,
                                 timeline: [],
+                                state: {},
                             },
                         },
                         sync: {},
@@ -389,6 +398,7 @@ describe('the matrix redux wrap reducer', () => {
                             '!myroomid': {
                                 name: null,
                                 timeline: [],
+                                state: {},
                                 members: {
                                     '@userid:domain': {
                                         membership: 'join',
@@ -435,6 +445,7 @@ describe('the matrix redux wrap reducer', () => {
                             '!myroomid': {
                                 name: null,
                                 timeline: [],
+                                state: {},
                                 members: {
                                     '@userid:domain': {
                                         membership: 'join',
@@ -484,6 +495,7 @@ describe('the matrix redux wrap reducer', () => {
                             '!myroomid': {
                                 name: null,
                                 timeline: [],
+                                state: {},
                                 members: {
                                     '@userid1:domain': {
                                         membership: 'join',
@@ -530,6 +542,7 @@ describe('the matrix redux wrap reducer', () => {
                                     sender: '@userid:domain',
                                     ts: 12345,
                                 }],
+                                state: {},
                             },
                         },
                         sync: {},
@@ -580,6 +593,131 @@ describe('the matrix redux wrap reducer', () => {
                                     sender: '@userid:domain',
                                     ts: 123456,
                                 }],
+                                state: {},
+                            },
+                        },
+                        sync: {},
+                    },
+                },
+            });
+        });
+
+        it('handles state events', () => {
+            const eventA = new MatrixEvent({
+                room_id: '!myroomid',
+                type: 'c.some.state',
+                content: {
+                    state: 'awesome',
+                },
+                sender: '@userid:domain',
+                state_key: 'apples',
+                origin_server_ts: 12345,
+            });
+            const eventB = new MatrixEvent({
+                room_id: '!myroomid',
+                type: 'c.some.other.state',
+                content: {
+                    state: 'wow',
+                },
+                sender: '@userid:domain',
+                state_key: 'bananas',
+                origin_server_ts: 123456,
+            });
+            const room = new Room('!myroomid');
+            const actions = [
+                undefined,
+                createWrappedEventAction('Room', [room]),
+                createWrappedEventAction('RoomState.events', [eventA, room]),
+                createWrappedEventAction('RoomState.events', [eventB, room]),
+            ];
+            runActionsAndExpectState(actions, {
+                mrw: {
+                    wrapped_api: {},
+                    wrapped_state: {
+                        rooms: {
+                            '!myroomid': {
+                                members: {},
+                                name: null,
+                                timeline: [],
+                                state: {
+                                    'c.some.other.state': {
+                                        bananas: {
+                                            content: {
+                                                state: 'wow',
+                                            },
+                                            sender: '@userid:domain',
+                                            ts: 123456,
+                                            type: 'c.some.other.state',
+                                        },
+                                    },
+                                    'c.some.state': {
+                                        apples: {
+                                            content: {
+                                                state: 'awesome',
+                                            },
+                                            sender: '@userid:domain',
+                                            ts: 12345,
+                                            type: 'c.some.state',
+                                        },
+                                    },
+                                },
+                            },
+                        },
+                        sync: {},
+                    },
+                },
+            });
+        });
+
+        it('handles state changes', () => {
+            const eventA = new MatrixEvent({
+                room_id: '!myroomid',
+                type: 'c.some.state',
+                content: {
+                    state: 'awesome',
+                },
+                sender: '@userid:domain',
+                state_key: 'apples',
+                origin_server_ts: 12345,
+            });
+            const eventB = new MatrixEvent({
+                room_id: '!myroomid',
+                type: 'c.some.state',
+                content: {
+                    state: 'wow',
+                },
+                sender: '@userid:domain',
+                state_key: 'apples',
+                origin_server_ts: 123456,
+            });
+            const room = new Room('!myroomid');
+            const actions = [
+                undefined,
+                createWrappedEventAction('Room', [room]),
+                createWrappedEventAction('RoomState.events', [eventA, room]),
+                createWrappedEventAction('RoomState.events', [eventB, room]),
+            ];
+            runActionsAndExpectState(actions, {
+                mrw: {
+                    wrapped_api: {},
+                    wrapped_state: {
+                        rooms: {
+                            '!myroomid': {
+                                members: {},
+                                name: null,
+                                timeline: [],
+                                state: {
+                                    'c.some.state': {
+                                        apples: {
+                                            content: {
+                                                state: 'wow',
+                                            },
+                                            sender: '@userid:domain',
+                                            ts: 123456,
+                                            type: 'c.some.state',
+                                        },
+                                    },
+                                },
                             },
                         },
                         sync: {},

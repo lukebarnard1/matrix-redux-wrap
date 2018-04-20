@@ -516,6 +516,7 @@ describe('the matrix redux wrap reducer', () => {
 
         it('inserts events into the timeline', () => {
             const event = new MatrixEvent({
+                event_id: 'some_event_id',
                 room_id: '!myroomid',
                 type: 'm.room.message',
                 content: {
@@ -538,6 +539,9 @@ describe('the matrix redux wrap reducer', () => {
                                 members: {},
                                 name: null,
                                 timeline: [{
+                                    id: 'some_event_id',
+                                    type: 'm.room.message',
+                                    prevContent: {},
                                     content: { body: 'Hello, world!' },
                                     sender: '@userid:domain',
                                     ts: 12345,
@@ -553,6 +557,7 @@ describe('the matrix redux wrap reducer', () => {
 
         it('inserts multiple events into the timeline', () => {
             const eventA = new MatrixEvent({
+                event_id: 'some_event_id',
                 room_id: '!myroomid',
                 type: 'm.room.message',
                 content: {
@@ -562,6 +567,7 @@ describe('the matrix redux wrap reducer', () => {
                 origin_server_ts: 12345,
             });
             const eventB = new MatrixEvent({
+                event_id: 'some_other_event_id',
                 room_id: '!myroomid',
                 type: 'm.room.message',
                 content: {
@@ -585,11 +591,17 @@ describe('the matrix redux wrap reducer', () => {
                                 members: {},
                                 name: null,
                                 timeline: [{
+                                    id: 'some_event_id',
+                                    type: 'm.room.message',
                                     content: { body: 'Hello, world!' },
+                                    prevContent: {},
                                     sender: '@userid:domain',
                                     ts: 12345,
                                 }, {
+                                    id: 'some_other_event_id',
+                                    type: 'm.room.message',
                                     content: { body: 'Hello (again), world!' },
+                                    prevContent: {},
                                     sender: '@userid:domain',
                                     ts: 123456,
                                 }],

@@ -20,7 +20,10 @@ const emittedEventToEmittedArgs = {
     Room: room => ({ roomId: room.roomId }),
     'Room.timeline': rawEvent => ({
         roomId: rawEvent.getRoomId(),
+        id: rawEvent.getId(),
+        type: rawEvent.getType(),
         content: rawEvent.getContent(),
+        prevContent: rawEvent.getPrevContent(),
         ts: rawEvent.getTs(),
         sender: rawEvent.getSender(),
     }),

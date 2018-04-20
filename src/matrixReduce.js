@@ -163,7 +163,10 @@ function reduceWrappedEventAction(action, path, wrappedState) {
     case 'Room.timeline': {
         const {
             roomId,
+            id,
+            type,
             content,
+            prevContent,
             ts,
             sender,
         } = action.emittedArgs;
@@ -173,7 +176,14 @@ function reduceWrappedEventAction(action, path, wrappedState) {
         return setInObj(
             wrappedState,
             ['rooms', roomId, 'timeline'],
-            [...timeline, { content, ts, sender }],
+            [...timeline, {
+                content,
+                prevContent,
+                ts,
+                sender,
+                type,
+                id,
+            }],
         );
     }
     default:

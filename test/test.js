@@ -381,6 +381,7 @@ describe('the matrix redux wrap reducer', () => {
                 room_id: '!myroomid',
                 type: 'm.room.member',
                 content: {
+                    avatar_url: 'mxc://someavatarurl',
                     membership: 'join',
                 },
             });
@@ -403,6 +404,7 @@ describe('the matrix redux wrap reducer', () => {
                                     '@userid:domain': {
                                         membership: 'join',
                                         name: '@userid:domain',
+                                        avatarUrl: 'mxc://someavatarurl',
                                     },
                                 },
                             },
@@ -448,6 +450,7 @@ describe('the matrix redux wrap reducer', () => {
                                 state: {},
                                 members: {
                                     '@userid:domain': {
+                                        avatarUrl: undefined,
                                         membership: 'join',
                                         name: 'Neo',
                                     },
@@ -498,10 +501,12 @@ describe('the matrix redux wrap reducer', () => {
                                 state: {},
                                 members: {
                                     '@userid1:domain': {
+                                        avatarUrl: undefined,
                                         membership: 'join',
                                         name: 'Morpheus',
                                     },
                                     '@userid2:domain': {
+                                        avatarUrl: undefined,
                                         membership: 'join',
                                         name: 'Trinity',
                                     },

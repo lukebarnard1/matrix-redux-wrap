@@ -45,6 +45,9 @@ const emittedEventToEmittedArgs = {
         userId: member.userId,
         name: member.name,
         membership: member.membership,
+        avatarUrl: member.events.member ?
+            member.events.member.getContent().avatar_url :
+            null,
     }),
     'RoomMember.name': (event, member) => ({
         roomId: event.getRoomId(),

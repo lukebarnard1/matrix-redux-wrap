@@ -147,9 +147,14 @@ function reduceWrappedEventAction(action, path, wrappedState) {
             membership,
             name,
             userId,
+            avatarUrl,
         } = action.emittedArgs;
 
-        return setInObj(wrappedState, ['rooms', roomId, 'members', userId], { membership, name });
+        return setInObj(wrappedState, ['rooms', roomId, 'members', userId], {
+            membership,
+            name,
+            avatarUrl,
+        });
     }
     case 'RoomMember.name': {
         const {

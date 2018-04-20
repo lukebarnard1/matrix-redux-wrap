@@ -545,6 +545,7 @@ describe('the matrix redux wrap reducer', () => {
                                     content: { body: 'Hello, world!' },
                                     sender: '@userid:domain',
                                     ts: 12345,
+                                    redactedBecause: undefined,
                                 }],
                                 state: {},
                             },
@@ -597,6 +598,7 @@ describe('the matrix redux wrap reducer', () => {
                                     prevContent: {},
                                     sender: '@userid:domain',
                                     ts: 12345,
+                                    redactedBecause: undefined,
                                 }, {
                                     id: 'some_other_event_id',
                                     type: 'm.room.message',
@@ -604,6 +606,7 @@ describe('the matrix redux wrap reducer', () => {
                                     prevContent: {},
                                     sender: '@userid:domain',
                                     ts: 123456,
+                                    redactedBecause: undefined,
                                 }],
                                 state: {},
                             },

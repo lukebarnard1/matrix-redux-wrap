@@ -169,6 +169,7 @@ function reduceWrappedEventAction(action, path, wrappedState) {
             prevContent,
             ts,
             sender,
+            redactedBecause,
         } = action.emittedArgs;
 
         const timeline = getInObj(wrappedState, ['rooms', roomId, 'timeline']) || [];
@@ -183,6 +184,7 @@ function reduceWrappedEventAction(action, path, wrappedState) {
                 sender,
                 type,
                 id,
+                redactedBecause,
             }],
         );
     }

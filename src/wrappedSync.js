@@ -26,6 +26,7 @@ const emittedEventToEmittedArgs = {
         prevContent: rawEvent.getPrevContent(),
         ts: rawEvent.getTs(),
         sender: rawEvent.getSender(),
+        redactedBecause: rawEvent.getUnsigned().redacted_because,
     }),
     'Room.name': room => ({
         roomId: room.roomId,

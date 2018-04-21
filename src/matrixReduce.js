@@ -149,10 +149,12 @@ function reduceWrappedEventAction(action, path, wrappedState) {
 
         // Assume that removing content, prevContent is enough
         redactedEvent.content = {};
-        redactedEvent.prevContent = {};
+        if (redactedEvent.prevContent !== undefined) {
+            redactedEvent.prevContent = {};
+        }
         redactedEvent.redactedBecause = redactedBecause;
 
-        return setInObj(
+        let newState = setInObj(
             wrappedState,
             ['rooms', roomId, 'timeline'],
             // Create a new timeline with the redacted equivalent of the event
@@ -164,15 +166,52 @@ function reduceWrappedEventAction(action, path, wrappedState) {
                 return Object.assign({}, e);
             }),
         );
+
+        const roomState = getInObj(wrappedState, ['rooms', roomId, 'state']);
+
+        const redactedStateEvent = Object.assign(
+            {},
+            Object.keys(roomState).reduce((result, type) =>
+                (result || Object.keys(roomState[type]).reduce((result2, key) =>
+                    (result2 ||
+                        roomState[type][key].id === redactedEventId ?
+                        roomState[type][key] : undefined
+                    ), undefined)), undefined) || {},
+        );
+
+        // Assume that removing content, prevContent is enough
+        redactedStateEvent.content = {};
+        if (redactedStateEvent.prevContent !== undefined) {
+            redactedStateEvent.prevContent = {};
+        }
+        redactedStateEvent.redactedBecause = redactedBecause;
+
+        newState = setInObj(
+            newState,
+            ['rooms', roomId, 'state'],
+            Object.keys(roomState).reduce((result, type) => ({
+                [type]: Object.keys(roomState[type]).reduce((result2, key) => ({
+                    [key]: roomState[type][key].id === redactedEventId ?
+                        redactedStateEvent :
+                        Object.assign({}, roomState[type][key]),
+                    ...result2,
+                }), {}),
+                ...result,
+            }), {}),
+        );
+
+        return newState;
     }
     case 'RoomState.events': {
         const {
             roomId,
+            id,
             type,
             content,
             ts,
             sender,
             stateKey,
+            redactedBecause,
         } = action.emittedArgs;
         const prevState = Object.assign(
             {},
@@ -180,10 +219,12 @@ function reduceWrappedEventAction(action, path, wrappedState) {
         );
 
         prevState.state = setInObj(prevState.state, [type, stateKey], {
+            id,
             type,
             content,
             sender,
             ts,
+            redactedBecause,
         });
 
         return setInObj(wrappedState, ['rooms', roomId], prevState);

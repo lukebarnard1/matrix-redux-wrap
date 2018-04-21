@@ -47,11 +47,13 @@ const emittedEventToEmittedArgs = {
     }),
     'RoomState.events': event => ({
         roomId: event.getRoomId(),
+        id: event.getId(),
         type: event.getType(),
         content: event.getContent(),
         ts: event.getTs(),
         sender: event.getSender(),
         stateKey: event.getStateKey(),
+        redactedBecause: event.getUnsigned().redacted_because,
     }),
     'RoomMember.membership': (event, member) => ({
         roomId: event.getRoomId(),

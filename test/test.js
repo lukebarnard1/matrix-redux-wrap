@@ -677,6 +677,8 @@ describe('the matrix redux wrap reducer', () => {
                                 state: {
                                     'c.some.other.state': {
                                         bananas: {
+                                            id: undefined,
+                                            redactedBecause: undefined,
                                             content: {
                                                 state: 'wow',
                                             },
@@ -687,6 +689,8 @@ describe('the matrix redux wrap reducer', () => {
                                     },
                                     'c.some.state': {
                                         apples: {
+                                            id: undefined,
+                                            redactedBecause: undefined,
                                             content: {
                                                 state: 'awesome',
                                             },
@@ -745,6 +749,8 @@ describe('the matrix redux wrap reducer', () => {
                                 state: {
                                     'c.some.state': {
                                         apples: {
+                                            id: undefined,
+                                            redactedBecause: undefined,
                                             content: {
                                                 state: 'wow',
                                             },
@@ -859,6 +865,66 @@ describe('the matrix redux wrap reducer', () => {
                                 }],
                                 state: {},
                                 receipts: {},
+                            },
+                        },
+                        sync: {},
+                    },
+                },
+            });
+        });
+
+        it('handles state event redactions', () => {
+            const event = new MatrixEvent({
+                event_id: '$some_event_id',
+                room_id: '!myroomid',
+                type: 'c.some.state',
+                content: {
+                    state: 'awesome',
+                },
+                sender: '@userid:domain',
+                state_key: 'apples',
+                origin_server_ts: 12345,
+            });
+            const redactionEvent = new MatrixEvent({
+                room_id: '!myroomid',
+                type: 'm.room.redaction',
+                redacts: '$some_event_id',
+                sender: '@userid:domain',
+                origin_server_ts: 123456,
+            });
+            const room = new Room('!myroomid');
+            const actions = [
+                undefined,
+                createWrappedEventAction('Room', [room]),
+                createWrappedEventAction('RoomState.events', [event, room]),
+                createWrappedEventAction('Room.redaction', [redactionEvent]),
+            ];
+            runActionsAndExpectState(actions, {
+                mrw: {
+                    wrapped_api: {},
+                    wrapped_state: {
+                        rooms: {
+                            '!myroomid': {
+                                members: {},
+                                name: null,
+                                timeline: [],
+                                receipts: {},
+                                state: {
+                                    'c.some.state': {
+                                        apples: {
+                                            id: '$some_event_id',
+                                            content: {},
+                                            sender: '@userid:domain',
+                                            ts: 12345,
+                                            type: 'c.some.state',
+                                            redactedBecause: {
+                                                sender: '@userid:domain',
+                                                content: {},
+                                                ts: 123456,
+                                            },
+                                        },
+                                    },
+                                },
                             },
                         },
                         sync: {},

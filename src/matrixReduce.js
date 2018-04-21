@@ -74,6 +74,16 @@ function reduceWrappedAPIAction(action, path, state) {
     });
 }
 
+function roomInitialState() {
+    return {
+        name: null,
+        members: {},
+        timeline: [],
+        state: {},
+        receipts: {},
+    };
+}
+
 function reduceWrappedEventAction(action, path, wrappedState) {
     switch (action.emittedType) {
     case 'sync': {
@@ -87,12 +97,7 @@ function reduceWrappedEventAction(action, path, wrappedState) {
         const { roomId } = action.emittedArgs;
         const newState = Object.assign(
             {},
-            wrappedState.rooms[roomId] || {
-                name: null,
-                members: {},
-                timeline: [],
-                state: {},
-            },
+            wrappedState.rooms[roomId] || roomInitialState(),
         );
 
         return setInObj(wrappedState, ['rooms', roomId], newState);
@@ -101,12 +106,7 @@ function reduceWrappedEventAction(action, path, wrappedState) {
         const { roomId, name } = action.emittedArgs;
         const prevState = Object.assign(
             {},
-            wrappedState.rooms[roomId] || {
-                name: null,
-                members: {},
-                timeline: [],
-                state: {},
-            },
+            wrappedState.rooms[roomId] || roomInitialState(),
         );
 
         const newState = Object.assign(prevState, { name });

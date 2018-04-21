@@ -113,6 +113,30 @@ function reduceWrappedEventAction(action, path, wrappedState) {
 
         return setInObj(wrappedState, ['rooms', roomId], newState);
     }
+    case 'Room.receipt': {
+        const {
+            roomId,
+            content,
+        } = action.emittedArgs;
+
+        if (!content) return wrappedState;
+
+        let roomReceipts = getInObj(wrappedState, ['rooms', roomId, 'receipts']);
+
+        // XXX: Slightly worrying that O(n^3) algorithm exists where n is defined
+        // outside of the app.
+        Object.keys(content).forEach((eventId) => {
+            Object.keys(content[eventId]).forEach((receiptType) => {
+                Object.keys(content[eventId][receiptType]).forEach((userId) => {
+                    roomReceipts = setInObj(roomReceipts, [
+                        eventId, receiptType, userId,
+                    ], content[eventId][receiptType][userId]);
+                });
+            });
+        });
+
+        return setInObj(wrappedState, ['rooms', roomId, 'receipts'], roomReceipts);
+    }
     case 'RoomState.events': {
         const {
             roomId,

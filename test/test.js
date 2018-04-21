@@ -153,6 +153,7 @@ describe('the matrix redux wrap reducer', () => {
                                 name: null,
                                 timeline: [],
                                 state: {},
+                                receipts: {},
                             },
                         },
                         sync: {},
@@ -178,6 +179,7 @@ describe('the matrix redux wrap reducer', () => {
                                 name: null,
                                 timeline: [],
                                 state: {},
+                                receipts: {},
                             },
                         },
                         sync: {},
@@ -202,12 +204,14 @@ describe('the matrix redux wrap reducer', () => {
                                 name: null,
                                 timeline: [],
                                 state: {},
+                                receipts: {},
                             },
                             '!someotherroomid': {
                                 members: {},
                                 name: null,
                                 timeline: [],
                                 state: {},
+                                receipts: {},
                             },
                         },
                         sync: {},
@@ -233,6 +237,7 @@ describe('the matrix redux wrap reducer', () => {
                                 name: 'This is a room name',
                                 timeline: [],
                                 state: {},
+                                receipts: {},
                             },
                         },
                         sync: {},
@@ -259,6 +264,7 @@ describe('the matrix redux wrap reducer', () => {
                                 name: 'This is a room name',
                                 timeline: [],
                                 state: {},
+                                receipts: {},
                             },
                         },
                         sync: {},
@@ -285,6 +291,7 @@ describe('the matrix redux wrap reducer', () => {
                                 name: 'This is a room name',
                                 timeline: [],
                                 state: {},
+                                receipts: {},
                             },
                         },
                         sync: {},
@@ -314,6 +321,7 @@ describe('the matrix redux wrap reducer', () => {
                                 name: 'Some other crazy name',
                                 timeline: [],
                                 state: {},
+                                receipts: {},
                             },
                         },
                         sync: {},
@@ -349,6 +357,7 @@ describe('the matrix redux wrap reducer', () => {
                                 name: null,
                                 timeline: [],
                                 state: {},
+                                receipts: {},
                             },
                         },
                         sync: {},
@@ -400,6 +409,7 @@ describe('the matrix redux wrap reducer', () => {
                                 name: null,
                                 timeline: [],
                                 state: {},
+                                receipts: {},
                                 members: {
                                     '@userid:domain': {
                                         membership: 'join',
@@ -448,6 +458,7 @@ describe('the matrix redux wrap reducer', () => {
                                 name: null,
                                 timeline: [],
                                 state: {},
+                                receipts: {},
                                 members: {
                                     '@userid:domain': {
                                         avatarUrl: undefined,
@@ -499,6 +510,7 @@ describe('the matrix redux wrap reducer', () => {
                                 name: null,
                                 timeline: [],
                                 state: {},
+                                receipts: {},
                                 members: {
                                     '@userid1:domain': {
                                         avatarUrl: undefined,
@@ -553,6 +565,7 @@ describe('the matrix redux wrap reducer', () => {
                                     redactedBecause: undefined,
                                 }],
                                 state: {},
+                                receipts: {},
                             },
                         },
                         sync: {},
@@ -614,6 +627,7 @@ describe('the matrix redux wrap reducer', () => {
                                     redactedBecause: undefined,
                                 }],
                                 state: {},
+                                receipts: {},
                             },
                         },
                         sync: {},
@@ -659,6 +673,7 @@ describe('the matrix redux wrap reducer', () => {
                                 members: {},
                                 name: null,
                                 timeline: [],
+                                receipts: {},
                                 state: {
                                     'c.some.other.state': {
                                         bananas: {
@@ -726,6 +741,7 @@ describe('the matrix redux wrap reducer', () => {
                                 members: {},
                                 name: null,
                                 timeline: [],
+                                receipts: {},
                                 state: {
                                     'c.some.state': {
                                         apples: {
@@ -735,6 +751,55 @@ describe('the matrix redux wrap reducer', () => {
                                             sender: '@userid:domain',
                                             ts: 123456,
                                             type: 'c.some.state',
+                                        },
+                                    },
+                                },
+                            },
+                        },
+                        sync: {},
+                    },
+                },
+            });
+        });
+
+        it('handles read receipts', () => {
+            const event = new MatrixEvent({
+                room_id: '!myroomid',
+                type: 'm.receipt',
+                content: {
+                    $some_event_id: {
+                        'some.receipt.type': {
+                            '@userid:domain': {
+                                ts: 12345,
+                            },
+                        },
+                    },
+                },
+                sender: '@userid:domain',
+                origin_server_ts: 12345,
+            });
+            const room = new Room('!myroomid');
+            const actions = [
+                undefined,
+                createWrappedEventAction('Room', [room]),
+                createWrappedEventAction('Room.receipt', [event]),
+            ];
+            runActionsAndExpectState(actions, {
+                mrw: {
+                    wrapped_api: {},
+                    wrapped_state: {
+                        rooms: {
+                            '!myroomid': {
+                                members: {},
+                                name: null,
+                                timeline: [],
+                                state: {},
+                                receipts: {
+                                    $some_event_id: {
+                                        'some.receipt.type': {
+                                            '@userid:domain': {
+                                                ts: 12345,
+                                            },
                                         },
                                     },
                                 },

@@ -32,6 +32,10 @@ const emittedEventToEmittedArgs = {
         roomId: room.roomId,
         name: room.name,
     }),
+    'Room.receipt': event => ({
+        roomId: event.getRoomId(),
+        content: event.getContent(),
+    }),
     'RoomState.events': event => ({
         roomId: event.getRoomId(),
         type: event.getType(),

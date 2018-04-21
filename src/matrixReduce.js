@@ -121,7 +121,14 @@ function reduceWrappedEventAction(action, path, wrappedState) {
 
         if (!content) return wrappedState;
 
-        let roomReceipts = getInObj(wrappedState, ['rooms', roomId, 'receipts']);
+        const prevState = Object.assign(
+            {},
+            wrappedState.rooms[roomId] || roomInitialState(),
+        );
+
+        // XXX: We shouldn't reuse existing objects, we should only create new ones
+        // Immutable.js ftw
+        let roomReceipts = prevState.receipts;
 
         // XXX: Slightly worrying that O(n^3) algorithm exists where n is defined
         // outside of the app.
@@ -135,7 +142,9 @@ function reduceWrappedEventAction(action, path, wrappedState) {
             });
         });
 
-        return setInObj(wrappedState, ['rooms', roomId, 'receipts'], roomReceipts);
+        const newState = Object.assign(prevState, { receipts: roomReceipts });
+
+        return setInObj(wrappedState, ['rooms', roomId], newState);
     }
     case 'Room.redaction': {
         const { redactedBecause, redactedEventId, roomId } = action.emittedArgs;

@@ -36,6 +36,15 @@ const emittedEventToEmittedArgs = {
         roomId: event.getRoomId(),
         content: event.getContent(),
     }),
+    'Room.redaction': event => ({
+        redactedBecause: {
+            sender: event.getSender(),
+            content: event.getContent(),
+            ts: event.getTs(),
+        },
+        redactedEventId: event.event.redacts,
+        roomId: event.getRoomId(),
+    }),
     'RoomState.events': event => ({
         roomId: event.getRoomId(),
         type: event.getType(),

@@ -137,6 +137,34 @@ function reduceWrappedEventAction(action, path, wrappedState) {
 
         return setInObj(wrappedState, ['rooms', roomId, 'receipts'], roomReceipts);
     }
+    case 'Room.redaction': {
+        const { redactedBecause, redactedEventId, roomId } = action.emittedArgs;
+
+        const timeline = getInObj(wrappedState, ['rooms', roomId, 'timeline']);
+
+        const redactedEvent = Object.assign(
+            {},
+            timeline.find(e => e.id === redactedEventId),
+        );
+
+        // Assume that removing content, prevContent is enough
+        redactedEvent.content = {};
+        redactedEvent.prevContent = {};
+        redactedEvent.redactedBecause = redactedBecause;
+
+        return setInObj(
+            wrappedState,
+            ['rooms', roomId, 'timeline'],
+            // Create a new timeline with the redacted equivalent of the event
+            // in the original place of the unredacted event.
+            timeline.map((e) => {
+                if (e.id === redactedEventId) {
+                    return redactedEvent;
+                }
+                return Object.assign({}, e);
+            }),
+        );
+    }
     case 'RoomState.events': {
         const {
             roomId,

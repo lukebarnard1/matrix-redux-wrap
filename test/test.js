@@ -810,5 +810,61 @@ describe('the matrix redux wrap reducer', () => {
                 },
             });
         });
+
+        it('handles timeline event redactions', () => {
+            const event = new MatrixEvent({
+                event_id: '$some_event_id',
+                room_id: '!myroomid',
+                type: 'm.some.event',
+                content: {
+                    thisShouldBeRedacted: 'test test 1 2 3',
+                },
+                sender: '@userid:domain',
+                origin_server_ts: 12345,
+            });
+            const redactionEvent = new MatrixEvent({
+                room_id: '!myroomid',
+                type: 'm.room.redaction',
+                redacts: '$some_event_id',
+                sender: '@userid:domain',
+                origin_server_ts: 123456,
+            });
+            const room = new Room('!myroomid');
+            const actions = [
+                undefined,
+                createWrappedEventAction('Room', [room]),
+                createWrappedEventAction('Room.timeline', [event]),
+                createWrappedEventAction('Room.redaction', [redactionEvent]),
+            ];
+            runActionsAndExpectState(actions, {
+                mrw: {
+                    wrapped_api: {},
+                    wrapped_state: {
+                        rooms: {
+                            '!myroomid': {
+                                members: {},
+                                name: null,
+                                timeline: [{
+                                    id: '$some_event_id',
+                                    type: 'm.some.event',
+                                    content: {},
+                                    prevContent: {},
+                                    redactedBecause: {
+                                        sender: '@userid:domain',
+                                        content: {},
+                                        ts: 123456,
+                                    },
+                                    sender: '@userid:domain',
+                                    ts: 12345,
+                                }],
+                                state: {},
+                                receipts: {},
+                            },
+                        },
+                        sync: {},
+                    },
+                },
+            });
+        });
     });
 });

@@ -15,19 +15,22 @@ limitations under the License.
 
 */
 
+const matrixEventToArgs = event => ({
+    roomId: event.getRoomId(),
+    id: event.getId(),
+    type: event.getType(),
+    content: event.getContent(),
+    prevContent: event.getPrevContent(),
+    ts: event.getTs(),
+    sender: event.getSender(),
+    stateKey: event.getStateKey(),
+    redactedBecause: event.getUnsigned().redacted_because,
+});
+
 const emittedEventToEmittedArgs = {
     sync: state => ({ state }),
     Room: room => ({ roomId: room.roomId }),
-    'Room.timeline': rawEvent => ({
-        roomId: rawEvent.getRoomId(),
-        id: rawEvent.getId(),
-        type: rawEvent.getType(),
-        content: rawEvent.getContent(),
-        prevContent: rawEvent.getPrevContent(),
-        ts: rawEvent.getTs(),
-        sender: rawEvent.getSender(),
-        redactedBecause: rawEvent.getUnsigned().redacted_because,
-    }),
+    'Room.timeline': matrixEventToArgs,
     'Room.name': room => ({
         roomId: room.roomId,
         name: room.name,
@@ -45,16 +48,7 @@ const emittedEventToEmittedArgs = {
         redactedEventId: event.event.redacts,
         roomId: event.getRoomId(),
     }),
-    'RoomState.events': event => ({
-        roomId: event.getRoomId(),
-        id: event.getId(),
-        type: event.getType(),
-        content: event.getContent(),
-        ts: event.getTs(),
-        sender: event.getSender(),
-        stateKey: event.getStateKey(),
-        redactedBecause: event.getUnsigned().redacted_because,
-    }),
+    'RoomState.events': matrixEventToArgs,
     'RoomMember.membership': (event, member) => ({
         roomId: event.getRoomId(),
         userId: member.userId,

@@ -148,12 +148,7 @@ function reduceWrappedEventAction(action, path, wrappedState) {
         } = action.emittedArgs;
         const prevState = Object.assign(
             {},
-            wrappedState.rooms[roomId] || {
-                name: null,
-                members: {},
-                timeline: [],
-                state: {},
-            },
+            wrappedState.rooms[roomId] || roomInitialState(),
         );
 
         prevState.state = setInObj(prevState.state, [type, stateKey], {

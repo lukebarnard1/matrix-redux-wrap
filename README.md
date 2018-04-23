@@ -147,7 +147,7 @@ the following structure:
             '@userid:domain': {
               membership: 'join',
               name: 'Morpheus',
-            }
+            },
           },
           name: "some room name",
           state: {
@@ -159,15 +159,15 @@ the following structure:
                   avatarUrl: 'mxc://domain/flibblejibble',
                 },
                 ts: 1234,
-              }
+              },
             },
             'm.room.avatar': {
               '': {
                 content: {
                   url: 'mxc://domain/flibblejibble',
-                }
-              }
-            }
+                },
+              },
+            },
           },
           timeline: [{
             content: { body: 'hello, world!' },
@@ -191,14 +191,14 @@ the following structure:
               'm.receipt': {
                 '@userid:domain': {
                   ts: 12345,
-                }
-              }
-            }
-          }
+                },
+              },
+            },
+          },
         },
       },
-      sync: {}
-    }
-  }
+      sync: {},
+    },
+  },
 }
 ```

@@ -1,6 +1,6 @@
 {
   "name": "matrix-redux-wrap",
-  "version": "1.1.0",
+  "version": "1.1.1",
   "description": "Expose matrix-js-sdk state as a Redux store",
   "main": "index.js",
   "dependencies": {

@@ -141,6 +141,9 @@ the following structure:
       },
     },
     wrapped_state: {
+      sync: {
+        state: 'SYNCING',
+      },
       rooms: {
         '!myroomid': {
           members: {
@@ -197,7 +200,6 @@ the following structure:
           },
         },
       },
-      sync: {},
     },
   },
 }

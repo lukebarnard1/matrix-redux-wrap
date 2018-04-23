@@ -144,24 +144,61 @@ the following structure:
       rooms: {
         '!myroomid': {
           members: {
-            '@m0rph3us:the.matrix': {
+            '@userid:domain': {
               membership: 'join',
               name: 'Morpheus',
             }
           },
-          name: "Some room name",
+          name: "some room name",
+          state: {
+            'm.room.member': {
+              '@userid:domain': {
+                content: {
+                  membership: 'join',
+                  name: 'Morpheus',
+                  avatarUrl: 'mxc://domain/flibblejibble',
+                },
+                ts: 1234,
+              }
+            },
+            'm.room.avatar': {
+              '': {
+                content: {
+                  url: 'mxc://domain/flibblejibble',
+                }
+              }
+            }
+          },
           timeline: [{
-              content: { body: 'Hello, world!' },
-              sender: '@userid:domain',
-              ts: 12345,
+            content: { body: 'hello, world!' },
+            sender: '@userid:domain',
+            ts: 12345,
           }, {
-              content: { body: 'Hello (again), world!' },
+            content: { body: 'hello (again), world!' },
+            sender: '@userid:domain',
+            ts: 123456,
+          }, {
+            content: {},
+            sender: '@userid:domain',
+            ts: 1234567,
+            redactedBecause: {
               sender: '@userid:domain',
-              ts: 123456,
-          }]
+              ts: 12345678,
+            },
+          }],
+          receipts: {
+            '$some_event_id': {
+              'm.receipt': {
+                '@userid:domain': {
+                  ts: 12345,
+                }
+              }
+            }
+          }
         },
       },
       sync: {}
     }
+  }
 }
 ```

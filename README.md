@@ -156,6 +156,7 @@ the following structure:
           state: {
             'm.room.member': {
               '@userid:domain': {
+                id: '$some_awesome_event_id',
                 content: {
                   membership: 'join',
                   name: 'Morpheus',
@@ -173,14 +174,20 @@ the following structure:
             },
           },
           timeline: [{
+            id: '$some_event_id',
+            type: 'm.room.message',
             content: { body: 'hello, world!' },
             sender: '@userid:domain',
             ts: 12345,
           }, {
+            id: '$some_other_event_id',
+            type: 'm.room.message',
             content: { body: 'hello (again), world!' },
             sender: '@userid:domain',
             ts: 123456,
           }, {
+            id: '$some_other_event_id2',
+            type: 'x.weird.event',
             content: {},
             sender: '@userid:domain',
             ts: 1234567,

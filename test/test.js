@@ -17,7 +17,7 @@ limitations under the License.
 
 */
 
-const { matrixReduce } = require('../index.js');
+const { matrixReduce } = require('../src/index.js');
 const { createWrappedEventAction } = require('../src/wrappedSync.js');
 
 const { expect } = require('chai');

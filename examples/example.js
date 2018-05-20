@@ -16,7 +16,7 @@ limitations under the License.
 
 */
 
-const { matrixReduce, asyncAction, wrapSyncingClient } = require('../index.js');
+const { matrixReduce, asyncAction, wrapSyncingClient } = require('../src');
 const Matrix = require('matrix-js-sdk');
 
 const readline = require('readline');

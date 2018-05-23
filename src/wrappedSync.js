@@ -87,7 +87,56 @@ function wrapSyncingClient(syncClient, dispatch) {
         ));
 }
 
+function wrapDebounce(debounceMS, fn) {
+    let prevT = null;
+    let timeout = null;
+
+    return function debounce() {
+        if (prevT !== null) {
+            if (Date.now() - debounceMS < prevT) {
+                if (timeout) return;
+                timeout = setTimeout(() => debounce(), debounceMS - (Date.now() - prevT));
+                return;
+            }
+        }
+        if (timeout) {
+            clearTimeout(timeout);
+            timeout = null;
+        }
+
+        prevT = Date.now();
+
+        fn();
+    };
+}
+
+function wrapSyncingClientBatched(syncClient, debounceMS, dispatch) {
+    const actions = [];
+
+    const dispatchBatch = wrapDebounce(debounceMS, () => {
+        if (actions.length > 0) {
+            dispatch({
+                type: 'mrw.wrapped_event.series',
+                series: actions.splice(0),
+            });
+        }
+    });
+
+    Object.keys(emittedEventToEmittedArgs).forEach(emittedType =>
+        syncClient.on(
+            emittedType,
+            (...emittedArgs) => {
+                const action = createWrappedEventAction(emittedType, emittedArgs);
+                actions.push(action);
+
+                // Debounce over 500ms, dispatching one action for many
+                dispatchBatch();
+            },
+        ));
+}
+
 module.exports = {
     createWrappedEventAction,
     wrapSyncingClient,
+    wrapSyncingClientBatched,
 };

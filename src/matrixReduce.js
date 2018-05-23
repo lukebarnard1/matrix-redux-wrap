@@ -40,10 +40,9 @@ function isMatrixReduxAction(action) {
         action.type.startsWith('mrw');
 }
 
-function reduceWrappedAPIAction(action, path, state) {
+function reduceWrappedAPIAction(action, state) {
     const prevState = state;
-    const status = path[1];
-
+    const status = action.type.split('.').pop();
     const apiState = Object.assign(
         state[action.method] || {},
         {
@@ -52,16 +51,16 @@ function reduceWrappedAPIAction(action, path, state) {
         },
     );
 
-    switch (status) {
-    case 'success': {
+    switch (action.type) {
+    case 'mrw.wrapped_api.success': {
         apiState.lastResult = action.result;
         break;
     }
-    case 'failure': {
+    case 'mrw.wrapped_api.failure': {
         apiState.lastError = action.error;
         break;
     }
-    case 'pending': {
+    case 'mrw.wrapped_api.pending': {
         apiState.pendingState = action.pendingState;
         break;
     }
@@ -84,7 +83,21 @@ function roomInitialState() {
     };
 }
 
-function reduceWrappedEventAction(action, path, wrappedState) {
+function reduceWrappedEventAction(action, wrappedState) {
+    if (action.type === 'mrw.wrapped_event.series') {
+        const actionSeries = action.series;
+        if (actionSeries.length > 0) {
+            return actionSeries.reduce(
+                (result, item) =>
+                    reduceWrappedEventAction(
+                        item,
+                        result,
+                    )
+                , wrappedState,
+            );
+        }
+        return wrappedState;
+    }
     switch (action.emittedType) {
     case 'sync': {
         return setInObj(
@@ -326,7 +339,7 @@ function matrixReduce(action, state) {
 
     const oldState = getInObj(state, subReducer.statePath);
 
-    const newState = subReducer.reduceFn(action, path, oldState);
+    const newState = subReducer.reduceFn(action, oldState);
 
     return setInObj(state, subReducer.statePath, newState);
 }

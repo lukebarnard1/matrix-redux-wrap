@@ -16,7 +16,8 @@ limitations under the License.
 
 */
 
-const { matrixReduce, asyncAction, wrapSyncingClient } = require('../src');
+const { matrixReduce, asyncAction } = require('../src');
+const { wrapSyncingClientBatched } = require('../src/wrappedSync');
 const Matrix = require('matrix-js-sdk');
 
 const readline = require('readline');
@@ -130,7 +131,7 @@ function doLoginAndSync(mxClient, baseUrl, user, password) {
                 userId: resp.user_id,
                 accessToken: resp.access_token,
             });
-            wrapSyncingClient(syncClient, dis);
+            wrapSyncingClientBatched(syncClient, 500, dis);
             syncClient.startClient();
 
             // XXX: This is a bit horrible, maybe the user can be shown a UI for this?

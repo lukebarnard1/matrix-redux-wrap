@@ -122,17 +122,25 @@ function wrapSyncingClientBatched(syncClient, debounceMS, dispatch) {
         }
     });
 
-    Object.keys(emittedEventToEmittedArgs).forEach(emittedType =>
-        syncClient.on(
-            emittedType,
-            (...emittedArgs) => {
-                const action = createWrappedEventAction(emittedType, emittedArgs);
-                actions.push(action);
+    const removers = Object.keys(emittedEventToEmittedArgs).map((emittedType) => {
+        const fn = (...emittedArgs) => {
+            const action = createWrappedEventAction(emittedType, emittedArgs);
+            actions.push(action);
 
-                // Debounce over 500ms, dispatching one action for many
-                dispatchBatch();
-            },
-        ));
+            // Debounce over 500ms, dispatching one action for many
+            dispatchBatch();
+        };
+
+        syncClient.on(emittedType, fn);
+
+        return () => {
+            syncClient.off(emittedType, fn);
+        };
+    });
+
+    return () => {
+        removers.forEach(remover => remover());
+    };
 }
 
 module.exports = {
